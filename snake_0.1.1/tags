@@ -4,110 +4,203 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-CFLAGS	makefile	/^CFLAGS=-Wall -g -DTESTY$/;"	m
-COLLISION_WITH_APPLE	game.c	/^  COLLISION_WITH_APPLE,        \/\/snake growth +1$/;"	e	enum:__anon4	file:
-COLLISION_WITH_BORDER	game.c	/^  COLLISION_WITH_BORDER = 1,$/;"	e	enum:__anon4	file:
-COLLISION_WITH_ONESELF	game.c	/^  COLLISION_WITH_ONESELF, $/;"	e	enum:__anon4	file:
-COLLISION_WITH_OTHER_SNAKE	game.c	/^  COLLISION_WITH_OTHER_SNAKE,$/;"	e	enum:__anon4	file:
-COLLISION_WITH_WALL	game.c	/^  COLLISION_WITH_WALL, $/;"	e	enum:__anon4	file:
-HEADERS	makefile	/^HEADERS=snake_types.h$/;"	m
-IDX_BOARD_D	game.c	/^  IDX_BOARD_D = 3,$/;"	e	enum:__anon5	file:
-IDX_BOARD_L	game.c	/^  IDX_BOARD_L = 6,$/;"	e	enum:__anon5	file:
-IDX_BOARD_LD	game.c	/^  IDX_BOARD_LD = 1,$/;"	e	enum:__anon5	file:
-IDX_BOARD_LU	game.c	/^  IDX_BOARD_LU = 0,$/;"	e	enum:__anon5	file:
-IDX_BOARD_R	game.c	/^  IDX_BOARD_R = 7,$/;"	e	enum:__anon5	file:
-IDX_BOARD_RD	game.c	/^  IDX_BOARD_RD = 5,$/;"	e	enum:__anon5	file:
-IDX_BOARD_RU	game.c	/^  IDX_BOARD_RU = 4,$/;"	e	enum:__anon5	file:
-IDX_BOARD_U	game.c	/^  IDX_BOARD_U = 2,$/;"	e	enum:__anon5	file:
-IDX_COLLISION_BORDER	game.c	/^  IDX_COLLISION_BORDER = 1,$/;"	e	enum:__anon5	file:
-IDX_COLLISION_ONESLEF	game.c	/^  IDX_COLLISION_ONESLEF = 0,$/;"	e	enum:__anon5	file:
-IDX_COLLISION_OTHER_SNAKE	game.c	/^  IDX_COLLISION_OTHER_SNAKE = 3,$/;"	e	enum:__anon5	file:
-IDX_COLLISION_WALL	game.c	/^  IDX_COLLISION_WALL = 2,$/;"	e	enum:__anon5	file:
-IDX_SNAKE_BODY	game.c	/^  IDX_SNAKE_BODY = 1,$/;"	e	enum:__anon5	file:
-IDX_SNAKE_ERASE	game.c	/^  IDX_SNAKE_ERASE = 2,$/;"	e	enum:__anon5	file:
-IDX_SNAKE_HEAD	game.c	/^  IDX_SNAKE_HEAD = 0,$/;"	e	enum:__anon5	file:
-MAX_LEN_SNAKE	game.c	40;"	d	file:
-MAX_NUMBER_APPLES	game.c	39;"	d	file:
-NO_COLLISION	game.c	/^  NO_COLLISION = 0,$/;"	e	enum:__anon4	file:
-PRINT_DEBUG	game.c	/^void PRINT_DEBUG(snake_t *psn, int key){$/;"	f
-SNAKE_TYPES_H	snake_types.h	11;"	d
-TESTUJ_KODY_KLAWISZY	game.c	/^int TESTUJ_KODY_KLAWISZY(){$/;"	f
-a	game.c	/^  apple_t a[MAX_NUMBER_APPLES];$/;"	m	struct:__anon8	file:
-animation_bottom_coords	game.c	/^coords_t animation_bottom_coords;$/;"	v
-animation_frames_STAR	game.c	/^char *animation_frames_STAR = "\/-\\\\|";$/;"	v
-animation_size	game.c	/^size_t animation_size;$/;"	v
-apple_t	game.c	/^} apple_t;$/;"	t	typeref:struct:__anon7	file:
-apples	game.c	/^apples_t apples;$/;"	v
-apples_t	game.c	/^} apples_t;$/;"	t	typeref:struct:__anon8	file:
-board	snake_types.h	/^  int board;  \/\/board: empty or various obstacles$/;"	m	struct:__anon11
-board_border	game.c	/^  char* board_border;$/;"	m	struct:__anon6	file:
-board_t	snake_types.h	/^} board_t;$/;"	t	typeref:struct:__anon12
-cfg_edit	main.c	/^void cfg_edit(void){$/;"	f
-collision	game.c	/^  char* collision;$/;"	m	struct:__anon6	file:
-collision_detect	game.c	/^type_of_collision_t  collision_detect($/;"	f
-coords	game.c	/^coords_t coords; \/\/uniwersal variable for coordynates of screen$/;"	v
-coords_t	game.c	/^} coords_t;$/;"	t	typeref:struct:__anon3	file:
-draw_board	game.c	/^void draw_board(state_of_game_t *state_of_game){  $/;"	f
-draw_snake	game.c	/^void draw_snake(snake_t* ps, char snake_head_symbol){$/;"	f
-dx	game.c	/^  int dx;  \/\/step in x asix$/;"	m	struct:__anon1	file:
-dy	game.c	/^  int dy;$/;"	m	struct:__anon1	file:
-game_move	game.c	/^void game_move(snake_t *psn,$/;"	f
-game_start	game.c	/^void game_start(state_of_game_t *state_of_game){$/;"	f
-game_state_t	snake_types.h	/^} game_state_t;$/;"	t	typeref:enum:__anon10
-graphic_symbol	game.c	/^graphic_symbol_t graphic_symbol;$/;"	v
-graphic_symbol_index_t	game.c	/^} graphic_symbol_index_t;$/;"	t	typeref:enum:__anon5	file:
-graphic_symbol_t	game.c	/^} graphic_symbol_t;$/;"	t	typeref:struct:__anon6	file:
-gs_beginning	snake_types.h	/^  gs_beginning,$/;"	e	enum:__anon10
-gs_end	snake_types.h	/^  gs_end$/;"	e	enum:__anon10
-gs_go	snake_types.h	/^  gs_go, $/;"	e	enum:__anon10
-gs_over	snake_types.h	/^  gs_over,$/;"	e	enum:__anon10
-gs_pausa	snake_types.h	/^  gs_pausa, $/;"	e	enum:__anon10
-info_bottom_coords	game.c	/^coords_t info_bottom_coords;$/;"	v
-info_center_coords	game.c	/^coords_t info_center_coords;$/;"	v
-info_empty_space	game.c	/^char *info_empty_space = $/;"	v
-init_game	main.c	/^void init_game(void){$/;"	f
-init_globals	game.c	/^void init_globals(){$/;"	f
-init_ncurses	game.c	/^void init_ncurses(){$/;"	f
-init_snake	game.c	/^void init_snake(snake_t *psn){$/;"	f
-its_time_to_move	game.c	/^bool its_time_to_move(){$/;"	f
-len	game.c	/^  size_t len;$/;"	m	struct:__anon8	file:
-length	game.c	/^  int length;$/;"	m	struct:__anon1	file:
-main	main.c	/^int  main(int argc, char** argv){$/;"	f
-menu1	main.c	/^menu_state_t menu1(void){$/;"	f
-menu_state_t	snake_types.h	/^} menu_state_t;$/;"	t	typeref:enum:__anon9
-ms_cfg	snake_types.h	/^  ms_cfg, $/;"	e	enum:__anon9
-ms_end	snake_types.h	/^  ms_end$/;"	e	enum:__anon9
-ms_game	snake_types.h	/^  ms_game, $/;"	e	enum:__anon9
-ms_menu	snake_types.h	/^  ms_menu,$/;"	e	enum:__anon9
-nr_ruchu	game.c	/^int nr_ruchu = 0;$/;"	v
-papples	game.c	/^apples_t *papples = &apples;$/;"	v
-prev_time_s	game.c	/^int prev_time_s;$/;"	v
-prev_time_us	game.c	/^int prev_time_us;$/;"	v
-print_bottom_animation	game.c	/^void print_bottom_animation(char *frames){$/;"	f
-print_bottom_info	game.c	/^void print_bottom_info(char *str, bool erase){$/;"	f
-print_center_info	game.c	/^void print_center_info(char *str, bool erase){$/;"	f
-screen	game.c	/^screen_t screen;  \/\/game has one screen only$/;"	v
-screen_t	game.c	/^} screen_t;$/;"	t	typeref:struct:__anon2	file:
-show_help	main.c	/^menu_state_t show_help(int argc, char** argv){$/;"	f
-snake_body	game.c	/^  char* snake_body;$/;"	m	struct:__anon6	file:
-snake_growth_N_and_move_forward_N	game.c	/^int snake_growth_N_and_move_forward_N(snake_t *psn, int n){ $/;"	f
-snake_move_forward	game.c	/^void snake_move_forward(snake_t *ps, coords_t *pc, bool growth){$/;"	f
-snake_t	game.c	/^} snake_t;$/;"	t	typeref:struct:__anon1	file:
-speed	snake_types.h	/^  int speed;$/;"	m	struct:__anon11
-state_of_game	snake_types.h	/^state_of_game_t state_of_game;$/;"	v
-state_of_game_t	snake_types.h	/^} state_of_game_t;$/;"	t	typeref:struct:__anon11
-time_tv	game.c	/^struct timeval time_tv;$/;"	v	typeref:struct:timeval
-time_unit	game.c	/^unsigned long time_unit;$/;"	v
-type_of_collision_t	game.c	/^} type_of_collision_t;$/;"	t	typeref:enum:__anon4	file:
-x	game.c	/^  int x;$/;"	m	struct:__anon3	file:
-x	game.c	/^  int x;$/;"	m	struct:__anon7	file:
-x	game.c	/^  int x[MAX_LEN_SNAKE];$/;"	m	struct:__anon1	file:
-xmax	game.c	/^  int xmax;$/;"	m	struct:__anon2	file:
-xmid	game.c	/^  int xmid; \/\/center of screen x$/;"	m	struct:__anon2	file:
-xmin	game.c	/^  int xmin;  \/\/left upper x$/;"	m	struct:__anon2	file:
-y	game.c	/^  int y;$/;"	m	struct:__anon3	file:
-y	game.c	/^  int y;$/;"	m	struct:__anon7	file:
-y	game.c	/^ int y[MAX_LEN_SNAKE];$/;"	m	struct:__anon1	file:
-ymax	game.c	/^  int ymax;$/;"	m	struct:__anon2	file:
-ymid	game.c	/^  int ymid;$/;"	m	struct:__anon2	file:
-ymin	game.c	/^  int ymin;$/;"	m	struct:__anon2	file:
+APPLES_H	apples.h	2;"	d
+CFLAGS	Makefile	/^CFLAGS=-Wall -g$/;"	m
+COLLISION_WITH_APPLE	game_logic.h	/^  COLLISION_WITH_APPLE,        \/\/snake growth +1$/;"	e	enum:type_of_collision_tt
+COLLISION_WITH_BORDER	game_logic.h	/^  COLLISION_WITH_BORDER = 1,$/;"	e	enum:type_of_collision_tt
+COLLISION_WITH_ONESELF	game_logic.h	/^  COLLISION_WITH_ONESELF,$/;"	e	enum:type_of_collision_tt
+COLLISION_WITH_OTHER_SNAKE	game_logic.h	/^  COLLISION_WITH_OTHER_SNAKE,$/;"	e	enum:type_of_collision_tt
+COLLISION_WITH_WALL	game_logic.h	/^  COLLISION_WITH_WALL,$/;"	e	enum:type_of_collision_tt
+GAME_HEADERS	Makefile	/^GAME_HEADERS=\\$/;"	m
+GAME_LOGIC_H	game_logic.h	2;"	d
+GAME_MENU_DEFINITION_H	game_menu_definition.h	2;"	d
+GAME_NCURSES_H	game_UI.h	2;"	d
+GAME_OBJECTS	Makefile	/^GAME_OBJECTS=\\$/;"	m
+IDX_APPLE_CLEAN	game_UI.h	/^  IDX_APPLE_CLEAN = 3,$/;"	e	enum:__anon3
+IDX_APPLE_NO1	game_UI.h	/^  IDX_APPLE_NO1 = 0,$/;"	e	enum:__anon3
+IDX_APPLE_NO2	game_UI.h	/^  IDX_APPLE_NO2 = 1,$/;"	e	enum:__anon3
+IDX_APPLE_NO3	game_UI.h	/^  IDX_APPLE_NO3 = 2,$/;"	e	enum:__anon3
+IDX_BOARD_D	game_UI.h	/^  IDX_BOARD_D = 3,$/;"	e	enum:__anon3
+IDX_BOARD_L	game_UI.h	/^  IDX_BOARD_L = 6,$/;"	e	enum:__anon3
+IDX_BOARD_LD	game_UI.h	/^  IDX_BOARD_LD = 1,$/;"	e	enum:__anon3
+IDX_BOARD_LU	game_UI.h	/^  IDX_BOARD_LU = 0,$/;"	e	enum:__anon3
+IDX_BOARD_R	game_UI.h	/^  IDX_BOARD_R = 7,$/;"	e	enum:__anon3
+IDX_BOARD_RD	game_UI.h	/^  IDX_BOARD_RD = 5,$/;"	e	enum:__anon3
+IDX_BOARD_RU	game_UI.h	/^  IDX_BOARD_RU = 4,$/;"	e	enum:__anon3
+IDX_BOARD_U	game_UI.h	/^  IDX_BOARD_U = 2,$/;"	e	enum:__anon3
+IDX_SNAKE_BODY	game_UI.h	/^  IDX_SNAKE_BODY = 1,$/;"	e	enum:__anon3
+IDX_SNAKE_ERASE	game_UI.h	/^  IDX_SNAKE_ERASE = 2,$/;"	e	enum:__anon3
+IDX_SNAKE_HEAD	game_UI.h	/^  IDX_SNAKE_HEAD = 0,$/;"	e	enum:__anon3
+IDX_UFO_1	game_UI.h	/^  IDX_UFO_1 = 0,$/;"	e	enum:__anon3
+INIT_UI_H	init_UI.h	2;"	d
+M1_CFG	game_menu_definition.h	/^  M1_CFG,$/;"	e	enum:user_choice_tt
+M1_CFG	test_menu_definition.h	/^  M1_CFG,$/;"	e	enum:user_choice_enum_t
+M1_END	game_menu_definition.h	/^  M1_END,$/;"	e	enum:user_choice_tt
+M1_END	test_menu_definition.h	/^  M1_END,$/;"	e	enum:user_choice_enum_t
+M1_START	game_menu_definition.h	/^  M1_START,$/;"	e	enum:user_choice_tt
+M1_START	test_menu_definition.h	/^  M1_START,$/;"	e	enum:user_choice_enum_t
+M2_CONTINUE	game_menu_definition.h	/^  M2_CONTINUE,$/;"	e	enum:user_choice_tt
+M2_END	test_menu_definition.h	/^  M2_END,$/;"	e	enum:user_choice_enum_t
+M2_GO	test_menu_definition.h	/^  M2_GO,$/;"	e	enum:user_choice_enum_t
+M2_RESTART	game_menu_definition.h	/^  M2_RESTART,$/;"	e	enum:user_choice_tt
+M3_END	game_menu_definition.h	/^  M3_END,$/;"	e	enum:user_choice_tt
+M3_END	test_menu_definition.h	/^  M3_END,$/;"	e	enum:user_choice_enum_t
+M3_RESTART	game_menu_definition.h	/^  M3_RESTART,$/;"	e	enum:user_choice_tt
+M3_RESTART	test_menu_definition.h	/^  M3_RESTART,$/;"	e	enum:user_choice_enum_t
+MAX_LEN_SNAKE	game_logic.h	7;"	d
+MAX_NUMBER_APPLES	game_logic.h	6;"	d
+MAX_NUMBER_OF_MENU	game_menu_definition.h	9;"	d
+MAX_NUMBER_OF_MENU	test_menu_definition.h	9;"	d
+MENU_DEFINITIONS_H	menu_definitions.h	2;"	d
+MENU_LOGIC_H	menu_logic.h	2;"	d
+MENU_UI_H	menu_UI.h	2;"	d
+MODE_COLLISION_APPLE	snake_logic.h	/^  MODE_COLLISION_APPLE = 5$/;"	e	enum:mode_of_snake_tt
+MODE_COLLISION_BORDER	snake_logic.h	/^  MODE_COLLISION_BORDER = 2,$/;"	e	enum:mode_of_snake_tt
+MODE_COLLISION_NOCOLLISION	snake_logic.h	/^  MODE_COLLISION_NOCOLLISION = 0,$/;"	e	enum:mode_of_snake_tt
+MODE_COLLISION_ONESLEF	snake_logic.h	/^  MODE_COLLISION_ONESLEF = 1,$/;"	e	enum:mode_of_snake_tt
+MODE_COLLISION_OTHER_SNAKE	snake_logic.h	/^  MODE_COLLISION_OTHER_SNAKE = 4,$/;"	e	enum:mode_of_snake_tt
+MODE_COLLISION_WALL	snake_logic.h	/^  MODE_COLLISION_WALL = 3,$/;"	e	enum:mode_of_snake_tt
+NO_COLLISION	game_logic.h	/^  NO_COLLISION = 0,$/;"	e	enum:type_of_collision_tt
+PRINT_DEBUG	game_UI.c	/^void PRINT_DEBUG(snake_t *psn, int key){$/;"	f
+SNAKE_LOGIC_H	snake_logic.h	3;"	d
+TEST_MENU_DEFINITION_H	test_menu_definition.h	2;"	d
+TEST_MENU_HEADERS	Makefile	/^TEST_MENU_HEADERS=init_UI.h menu_logic.h menu_UI.h menu_definitions.h test_menu_definition.h$/;"	m
+TEST_OBJECTS	Makefile	/^TEST_OBJECTS=test_menu_ncurses.o menu_logic.o menu_UI.o init_UI.o$/;"	m
+UI_refresh	game_UI.c	/^void UI_refresh(){$/;"	f
+a	apples.h	/^  apple_t a[MAX_NUMBER_APPLES];$/;"	m	struct:apples_tt
+apple	game_UI.h	/^  char* apple;$/;"	m	struct:__anon4
+apple_t	apples.h	/^} apple_t;$/;"	t	typeref:struct:apple_tt
+apple_tt	apples.h	/^typedef struct apple_tt{$/;"	s
+apples	game_logic.c	/^apples_t apples;$/;"	v
+apples_t	apples.h	/^} apples_t;$/;"	t	typeref:struct:apples_tt
+apples_tt	apples.h	/^typedef struct apples_tt{$/;"	s
+board_border	game_UI.h	/^  char* board_border;$/;"	m	struct:__anon4
+bufor_len	menu_UI.c	/^  size_t bufor_len;$/;"	m	struct:__anon1	file:
+call_menu	menu_logic.c	/^int call_menu(menu_t *pm){$/;"	f
+clean_apples	game_UI.c	/^void clean_apples(){$/;"	f
+collision	game_UI.h	/^  char* collision;$/;"	m	struct:__anon4
+collision_detect	game_logic.c	/^type_of_collision_t  collision_detect($/;"	f
+coords_t	init_UI.h	/^} coords_t;$/;"	t	typeref:struct:coords_tt
+coords_tt	init_UI.h	/^typedef struct coords_tt {$/;"	s
+covered	menu_UI.c	/^  int *covered;  \/\/part of screen covered by textx$/;"	m	struct:__anon1	file:
+create_menu	menu_UI.c	/^void create_menu(menu_t *pm){$/;"	f
+destroy_menu	menu_UI.c	/^void destroy_menu(menu_t *pm){$/;"	f
+draw_apples	game_UI.c	/^void draw_apples(){$/;"	f
+draw_apples_info	game_UI.c	/^void draw_apples_info(){$/;"	f
+draw_board	game_UI.c	/^void draw_board(){$/;"	f
+draw_cfg	game_UI.c	/^void draw_cfg(size_t *pspeed, size_t *psnake_max_length){$/;"	f
+draw_snake	game_UI.c	/^void draw_snake(snake_t* ps, unsigned snake_head_symbol){$/;"	f
+draw_snake_info	game_UI.c	/^void draw_snake_info(snake_t *psn){$/;"	f
+dx	snake_logic.h	/^  int dx;  \/\/step in x asix$/;"	m	struct:snake_tt
+dy	snake_logic.h	/^  int dy;$/;"	m	struct:snake_tt
+end_UI	init_UI.c	/^void end_UI(){$/;"	f
+g_time	game_logic.c	/^game_time_control_t g_time;$/;"	v
+game_cfg	game_logic.c	/^game_cfg_t game_cfg;$/;"	v
+game_cfg_t	game_logic.h	/^} game_cfg_t;$/;"	t	typeref:struct:game_cfg_tt
+game_cfg_tt	game_logic.h	/^typedef struct game_cfg_tt{$/;"	s
+game_move	game_logic.c	/^void game_move(snake_t *psn, game_state_t *pgame_state){$/;"	f
+game_start	game_logic.c	/^void game_start(){$/;"	f
+game_state_t	game_logic.h	/^} game_state_t;$/;"	t	typeref:enum:game_state_tt
+game_state_tt	game_logic.h	/^typedef enum game_state_tt{$/;"	g
+game_time_control_t	game_logic.h	/^} game_time_control_t;$/;"	t	typeref:struct:game_time_control_tt
+game_time_control_tt	game_logic.h	/^typedef struct game_time_control_tt{$/;"	s
+graphic_symbol	game_UI.c	/^graphic_symbol_t graphic_symbol;$/;"	v
+graphic_symbol_index_t	game_UI.h	/^} graphic_symbol_index_t;$/;"	t	typeref:enum:__anon3
+graphic_symbol_t	game_UI.h	/^} graphic_symbol_t;$/;"	t	typeref:struct:__anon4
+gs_beginning	game_logic.h	/^  gs_beginning,$/;"	e	enum:game_state_tt
+gs_cfg	game_logic.h	/^  gs_cfg,$/;"	e	enum:game_state_tt
+gs_end	game_logic.h	/^  gs_end,$/;"	e	enum:game_state_tt
+gs_go	game_logic.h	/^  gs_go,$/;"	e	enum:game_state_tt
+gs_over	game_logic.h	/^  gs_over$/;"	e	enum:game_state_tt
+gs_pausa	game_logic.h	/^  gs_pausa,$/;"	e	enum:game_state_tt
+gs_start	game_logic.h	/^  gs_start,$/;"	e	enum:game_state_tt
+hide_menu	menu_UI.c	/^void hide_menu(menu_t *pm){$/;"	f
+id	snake_logic.h	/^  int id; \/\/snake's number$/;"	m	struct:snake_tt
+id_menu	menu_logic.h	/^  const size_t id_menu;$/;"	m	struct:menu_tt
+init_UI	init_UI.c	/^void init_UI(){$/;"	f
+init_apples	apples.c	/^void init_apples(){$/;"	f
+init_globals_1	game_logic.c	/^void init_globals_1(){$/;"	f
+init_globals_2	game_UI.c	/^void init_globals_2(){$/;"	f
+init_snake	snake_logic.c	/^void init_snake(snake_t *psn, int id, size_t length){$/;"	f
+item_bufor2	menu_UI.c	/^  menu_item_bufor2_t **item_bufor2; \/\/tablica wkaznikow do buforow poszczegolnych pozycji menu$/;"	m	struct:__anon2	file:
+item_description	menu_logic.h	/^  const char* item_description;$/;"	m	struct:menu_item_tt
+item_id	menu_logic.h	/^  const int item_id;$/;"	m	struct:menu_item_tt
+item_name	menu_logic.h	/^  const char* item_name;$/;"	m	struct:menu_item_tt
+items	menu_logic.h	/^  const menu_item_t const *items;$/;"	m	struct:menu_tt
+its_time_to_move	game_logic.c	/^bool its_time_to_move(){$/;"	f
+len	apples.h	/^  size_t len;$/;"	m	struct:apples_tt
+length	snake_logic.h	/^  int length;$/;"	m	struct:snake_tt
+m1	game_menu_definition.c	/^menu_item_t m1[] = {$/;"	v
+m1	test_menu_ncurses.c	/^menu_item_t m1[] = {$/;"	v
+m2	game_menu_definition.c	/^menu_item_t m2[] = {$/;"	v
+m2	test_menu_ncurses.c	/^menu_item_t m2[] = {$/;"	v
+m3	game_menu_definition.c	/^menu_item_t m3[] = {$/;"	v
+m3	test_menu_ncurses.c	/^menu_item_t m3[] = {$/;"	v
+main	main.c	/^int main(){$/;"	f
+main	test_menu_ncurses.c	/^int main(int argc, char** argv){$/;"	f
+menu1	game_menu_definition.c	/^menu_t menu1 = {$/;"	v
+menu1	test_menu_ncurses.c	/^menu_t menu1 = {$/;"	v
+menu2	game_menu_definition.c	/^menu_t menu2 = {$/;"	v
+menu2	test_menu_ncurses.c	/^menu_t menu2 = {$/;"	v
+menu3	game_menu_definition.c	/^menu_t menu3 = {$/;"	v
+menu3	test_menu_ncurses.c	/^menu_t menu3 = {$/;"	v
+menu_item_bufor2_t	menu_UI.c	/^} menu_item_bufor2_t;$/;"	t	typeref:struct:__anon1	file:
+menu_item_t	menu_logic.h	/^} menu_item_t;$/;"	t	typeref:struct:menu_item_tt
+menu_item_text	menu_UI.c	/^void menu_item_text(char *text,$/;"	f
+menu_item_tt	menu_logic.h	/^typedef struct menu_item_tt{$/;"	s
+menu_items_bufors_t	menu_UI.c	/^} menu_items_bufors_t;$/;"	t	typeref:struct:__anon2	file:
+menu_t	menu_logic.h	/^} menu_t;$/;"	t	typeref:struct:menu_tt
+menu_title	menu_logic.h	/^  const char *menu_title;$/;"	m	struct:menu_tt
+menu_tt	menu_logic.h	/^typedef struct menu_tt{$/;"	s
+menus_bufors	menu_UI.c	/^menu_items_bufors_t menus_bufors[MAX_NUMBER_OF_MENU]; \/\/zamiast listy,  globalna wiec wyzerowana$/;"	v
+mode_of_snake_t	snake_logic.h	/^} mode_of_snake_t;$/;"	t	typeref:enum:mode_of_snake_tt
+mode_of_snake_tt	snake_logic.h	/^typedef enum mode_of_snake_tt{$/;"	g
+nr_ruchu	game_UI.c	/^int nr_ruchu = 0;$/;"	v
+number_of_items	menu_logic.h	/^  const size_t number_of_items;$/;"	m	struct:menu_tt
+number_of_snake	game_logic.h	/^  size_t number_of_snake;$/;"	m	struct:game_cfg_tt
+papples	game_logic.c	/^apples_t *papples = &apples;$/;"	v
+prev_time_s	game_logic.h	/^  int prev_time_s;$/;"	m	struct:game_time_control_tt
+prev_time_us	game_logic.h	/^  int prev_time_us;$/;"	m	struct:game_time_control_tt
+put_readed_screen	menu_UI.c	/^int put_readed_screen(int *buf, size_t max_buf, int y1, int x1, int y2, int x2){$/;"	f
+read_covered_area	menu_UI.c	/^void read_covered_area(char *bufor){$/;"	f
+read_screen	menu_UI.c	/^int read_screen(int *buf, size_t max_buf, int y1, int x1, int y2, int x2){$/;"	f
+screen	init_UI.c	/^screen_t screen;  \/\/game has one screen only$/;"	v
+screen_t	init_UI.h	/^} screen_t;$/;"	t	typeref:struct:screen_tt
+screen_tt	init_UI.h	/^typedef struct screen_tt{$/;"	s
+show_menu	menu_UI.c	/^void show_menu(menu_t *pm){$/;"	f
+snake_body	game_UI.h	/^  char* snake_body;$/;"	m	struct:__anon4
+snake_growth_N_and_move_forward_N	snake_logic.c	/^int snake_growth_N_and_move_forward_N(snake_t *psn, int n){$/;"	f
+snake_growth_tail_N	snake_logic.c	/^int snake_growth_tail_N(snake_t *psn, size_t n){$/;"	f
+snake_max_length	game_logic.h	/^  size_t snake_max_length[1];$/;"	m	struct:game_cfg_tt
+snake_move_forward	snake_logic.c	/^void snake_move_forward(snake_t *psn, coords_t *pc, bool growth){$/;"	f
+snake_t	snake_logic.h	/^} snake_t;$/;"	t	typeref:struct:snake_tt
+snake_tt	snake_logic.h	/^typedef struct snake_tt{$/;"	s
+speed	game_logic.h	/^  size_t speed;$/;"	m	struct:game_cfg_tt
+targedUI	Makefile	/^targedUI=NCURSES$/;"	m
+targetGAME	Makefile	/^targetGAME=GAME_MENU$/;"	m
+targetTEST	Makefile	/^targetTEST=TEST_MENU$/;"	m
+text	menu_UI.c	/^  char *text;     \/\/text menu's item$/;"	m	struct:__anon1	file:
+time_tv	game_logic.h	/^  struct timeval time_tv;$/;"	m	struct:game_time_control_tt	typeref:struct:game_time_control_tt::timeval
+time_unit	game_logic.h	/^  unsigned long time_unit;$/;"	m	struct:game_time_control_tt
+type_of_collision_t	game_logic.h	/^} type_of_collision_t;$/;"	t	typeref:enum:type_of_collision_tt
+type_of_collision_tt	game_logic.h	/^typedef enum type_of_collision_tt{$/;"	g
+ufo	game_UI.h	/^  char* ufo;$/;"	m	struct:__anon4
+user_choice_enum_t	test_menu_definition.h	/^enum user_choice_enum_t {$/;"	g
+user_choice_t	game_menu_definition.h	/^} user_choice_t;$/;"	t	typeref:enum:user_choice_tt
+user_choice_t	test_menu_definition.h	/^typedef enum user_choice_enum_t user_choice_t;$/;"	t	typeref:enum:user_choice_enum_t
+user_choice_tt	game_menu_definition.h	/^typedef enum user_choice_tt{$/;"	g
+wait_for_user_choice	menu_UI.c	/^int wait_for_user_choice(menu_t *pm){$/;"	f
+wypelnij_tlo	test_menu_ncurses.c	/^void wypelnij_tlo(){$/;"	f
+x	apples.h	/^  int x;$/;"	m	struct:apple_tt
+x	init_UI.h	/^  int x;$/;"	m	struct:coords_tt
+x	snake_logic.h	/^  int x[MAX_LEN_SNAKE];$/;"	m	struct:snake_tt
+xmax	init_UI.h	/^  int xmax;$/;"	m	struct:screen_tt
+xmid	init_UI.h	/^  int xmid; \/\/center of screen x$/;"	m	struct:screen_tt
+xmin	init_UI.h	/^  int xmin;  \/\/left upper x$/;"	m	struct:screen_tt
+xy	menu_UI.c	/^  coords_t xy;     \/\/wspolrzedne poczatku pozycji na ekranie$/;"	m	struct:__anon1	file:
+y	apples.h	/^  int y;$/;"	m	struct:apple_tt
+y	init_UI.h	/^  int y;$/;"	m	struct:coords_tt
+y	snake_logic.h	/^  int y[MAX_LEN_SNAKE];$/;"	m	struct:snake_tt
+ymax	init_UI.h	/^  int ymax;$/;"	m	struct:screen_tt
+ymid	init_UI.h	/^  int ymid;$/;"	m	struct:screen_tt
+ymin	init_UI.h	/^  int ymin;$/;"	m	struct:screen_tt
