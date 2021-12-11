@@ -1,0 +1,48 @@
+
+
+main_ncurses --> main_menu_ncurses, main_menu_logic
+  main menu:
+    start game
+    pause    
+    end game
+    restart (play_again)
+    edit cfg
+snake_ncurses --> game_snake_ncurses
+    drawing gameplay
+      - checking kdb and settin state
+      - drawing board
+      - drawing sanke in current state
+      - drawing apples
+      - drawing obstackles
+      - drawing other snakes
+      - drawing other things
+snake_logic --> game_snake_logic
+    logic gameplay:
+      - init apples
+      - placing apples
+      - changing states of game
+      - chekcing collisions (simple checking if any collision occured)
+snake_ --> snake_logic
+    logic of snake:
+      - init snake
+      - moving snake
+      - growing snake
+      - changing speed of snake
+
+
+      /???
+        czy to snake ma obserwowac plansze i sprawdzac czy sie z czyms
+        zderzy lub czy zbliza sie do niego inny snake
+
+        czy to plansza ma monitorowac ruch i ostrzegac lub informowac
+        snaki o zagrorzeniach i rozwoju sytuacji.
+        Tu musiala by pokazywac gdzie jest zderzenie a gdzie bezpieczne (w 
+        zakresie monitoringu) kierunki.
+
+        czy snake ma zadawac zapytania plnaszy o stan w danym kierunku.
+      ???/
+      -- obserwing fraction of board and making decision
+         about changing direction
+      -- checking and tracing approaching snakes
+      -- predicting collisions
+      -- interface for AI

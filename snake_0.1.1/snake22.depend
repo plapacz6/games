@@ -1,0 +1,194 @@
+# depslib dependency file v1.0
+1593768239 source:/home/pawel/d/code/snakeCB/snake22/game_logic.c
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<stdbool.h>
+	<ncurses.h>
+	<stdint.h>
+	<time.h>
+	<sys/time.h>
+	"init_UI.h"
+	"game_logic.h"
+	"game_menu_definition.h"
+	"snake_logic.h"
+	"game_UI.h"
+
+1593505934 /home/pawel/d/code/snakeCB/snake22/init_UI.h
+
+1593756551 /home/pawel/d/code/snakeCB/snake22/game_logic.h
+	<stdlib.h>
+	<sys/time.h>
+	<stdbool.h>
+
+1593764863 /home/pawel/d/code/snakeCB/snake22/game_menu_definition.h
+	"menu_logic.h"
+	"menu_UI.h"
+
+1593505934 /home/pawel/d/code/snakeCB/snake22/menu_logic.h
+	<stdlib.h>
+
+1593768314 /home/pawel/d/code/snakeCB/snake22/snake_logic.h
+
+1593768254 source:/home/pawel/d/code/snakeCB/snake22/game_UI.c
+	<stdlib.h>
+	<ncurses.h>
+	"init_UI.h"
+	"game_logic.h"
+	"game_UI.h"
+
+1593757327 /home/pawel/d/code/snakeCB/snake22/game_UI.h
+	"init_UI.h"
+
+1593505934 source:/home/pawel/d/code/snakeCB/snake22/init_UI.c
+	"init_UI.h"
+	<ncurses.h>
+
+1593757528 source:/home/pawel/d/code/snakeCB/snake22/main.c
+	<stdio.h>
+	<stdlib.h>
+	"init_UI.h"
+	"game_logic.h"
+
+1593505934 source:/home/pawel/d/code/snakeCB/snake22/menu_logic.c
+	<stdbool.h>
+	"menu_logic.h"
+	"menu_UI.h"
+
+1593760540 /home/pawel/d/code/snakeCB/snake22/menu_UI.h
+	"init_UI.h"
+	"menu_logic.h"
+	"menu_definitions.h"
+
+1593758142 /home/pawel/d/code/snakeCB/snake22/menu_definitions.h
+	"test_menu_definition.h"
+	"game_menu_definition.h"
+
+1593505934 /home/pawel/d/code/snakeCB/snake22/test_menu_definition.h
+	"menu_logic.h"
+
+1593760644 source:/home/pawel/d/code/snakeCB/snake22/menu_UI.c
+	<stdlib.h>
+	<malloc.h>
+	<string.h>
+	<ncurses.h>
+	"init_UI.h"
+	"menu_definitions.h"
+	"menu_UI.h"
+
+1593768280 source:/home/pawel/d/code/snakeCB/snake22/snake_logic.c
+	<stdbool.h>
+	"init_UI.h"
+	"game_logic.h"
+	"snake_logic.h"
+
+1593755801 source:/home/pawel/d/code/snakeCB/snake22/test_menu_ncurses.c
+	<ncurses.h>
+	<string.h>
+	"test_menu_definition.h"
+	"menu_UI.h"
+	"init_UI.h"
+
+1593765527 source:/home/pawel/d/code/snakeCB/snake22/game_menu_definition.c
+	"game_menu_definition.h"
+
+1593765527 source:/home/pawel/d/code/projekty/snakeCB/snake22/game_menu_definition.c
+	"game_menu_definition.h"
+
+1593764863 /home/pawel/d/code/projekty/snakeCB/snake22/game_menu_definition.h
+	"menu_logic.h"
+	"menu_UI.h"
+
+1593505934 /home/pawel/d/code/projekty/snakeCB/snake22/menu_logic.h
+	<stdlib.h>
+
+1593760540 /home/pawel/d/code/projekty/snakeCB/snake22/menu_UI.h
+	"init_UI.h"
+	"menu_logic.h"
+	"menu_definitions.h"
+
+1593505934 /home/pawel/d/code/projekty/snakeCB/snake22/init_UI.h
+
+1593758142 /home/pawel/d/code/projekty/snakeCB/snake22/menu_definitions.h
+	"test_menu_definition.h"
+	"game_menu_definition.h"
+
+1593505934 /home/pawel/d/code/projekty/snakeCB/snake22/test_menu_definition.h
+	"menu_logic.h"
+
+1593505934 source:/home/pawel/d/code/projekty/snakeCB/snake22/init_UI.c
+	"init_UI.h"
+	<ncurses.h>
+
+1593757528 source:/home/pawel/d/code/projekty/snakeCB/snake22/main.c
+	<stdio.h>
+	<stdlib.h>
+	"init_UI.h"
+	"game_logic.h"
+
+1594631918 /home/pawel/d/code/projekty/snakeCB/snake22/game_logic.h
+	<stdlib.h>
+	<sys/time.h>
+	<stdbool.h>
+
+1593505934 source:/home/pawel/d/code/projekty/snakeCB/snake22/menu_logic.c
+	<stdbool.h>
+	"menu_logic.h"
+	"menu_UI.h"
+
+1593760644 source:/home/pawel/d/code/projekty/snakeCB/snake22/menu_UI.c
+	<stdlib.h>
+	<malloc.h>
+	<string.h>
+	<ncurses.h>
+	"init_UI.h"
+	"menu_definitions.h"
+	"menu_UI.h"
+
+1594552998 source:/home/pawel/d/code/projekty/snakeCB/snake22/snake_logic.c
+	<stdbool.h>
+	"init_UI.h"
+	"game_logic.h"
+	"snake_logic.h"
+
+1594552744 /home/pawel/d/code/projekty/snakeCB/snake22/snake_logic.h
+
+1594554436 source:/home/pawel/d/code/projekty/snakeCB/snake22/apples.c
+	"apples.h"
+	<time.h>
+	<stdlib.h>
+	"init_UI.h"
+	<ncurses.h>
+
+1594552689 /home/pawel/d/code/projekty/snakeCB/snake22/apples.h
+	"game_logic.h"
+
+1594631796 source:/home/pawel/d/code/projekty/snakeCB/snake22/game_logic.c
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<stdbool.h>
+	<ncurses.h>
+	<stdint.h>
+	<time.h>
+	<sys/time.h>
+	"init_UI.h"
+	"game_logic.h"
+	"game_menu_definition.h"
+	"snake_logic.h"
+	"apples.h"
+	"game_UI.h"
+
+1594552934 /home/pawel/d/code/projekty/snakeCB/snake22/game_UI.h
+	"init_UI.h"
+	"snake_logic.h"
+
+1594553986 source:/home/pawel/d/code/projekty/snakeCB/snake22/game_UI.c
+	<stdlib.h>
+	<ncurses.h>
+	"init_UI.h"
+	"game_logic.h"
+	"game_UI.h"
+	"snake_logic.h"
+	"apples.h"
+

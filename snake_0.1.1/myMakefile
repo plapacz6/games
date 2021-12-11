@@ -1,0 +1,31 @@
+CFLAGS=-Wall -g
+HEADERS=game_logic.h game_UI.h init_UI.h menu_logic.h menu_UI.h snake_logic.h menu_definitions.h game_menu_definition.h
+TEST_MENU_HEADERS=init_UI.h menu_logic.h menu_UI.h menu_definitions.h test_menu_definition.h
+targedUI=NCURSES
+
+snake_UI: main.o init_UI.o menu_logic.o menu_UI.o game_logic.o game_UI.o snake_logic.o $(HEADERS)
+	gcc $(CFLAGS) main.o init_UI.o menu_logic.o menu_UI.o game_logic.o game_UI.o snake_logic.o -lncurses -o snake_UI
+	ctags -R
+
+game_logic.o: game_logic.c $(HEADERS)
+	gcc $(CFLAGS) -D$(targedUI) game_logic.c -c
+game_UI.o: game_UI.c $(HEADERS)
+	gcc $(CFLAGS) -D$(targedUI) game_UI.c -c
+init_UI.o: init_UI.c $(HEADERS)
+	gcc $(CFLAGS) -D$(targedUI) init_UI.c -c
+main.o: main.c $(HEADERS)
+	gcc $(CFLAGS) -D$(targedUI) main.c -c
+menu_logic.o: menu_logic.c $(HEADERS)
+	gcc $(CFLAGS) -D$(targedUI) menu_logic.c -c
+menu_UI.o: menu_UI.c $(HEADERS) $(TEST_MENU_HEADERS)
+	gcc $(CFLAGS) -D$(targedUI) menu_UI.c -c
+snake_logic.o: snake_logic.c $(HEADERS)
+	gcc $(CFLAGS) -D$(targedUI) snake_logic.c -c
+
+clean:
+	- rm *.o snake_UI test_menu_ncurses
+
+test_menu_ncurses.o: test_menu_ncurses.c test_menu_definition.h $(TEST_MENU_HEADERS)
+	gcc $(CFLAGS) -D$(targedUI) test_menu_ncurses.c -c
+test_menu_ncurses: test_menu_ncurses.o menu_logic.o menu_UI.o init_UI.o $(TEST_MENU_HEADERS)
+	gcc $(CFLAGS) -D$(targedUI) test_menu_ncurses.o menu_logic.o menu_UI.o init_UI.o -lncurses -o test_menu_ncurses
