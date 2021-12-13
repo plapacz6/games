@@ -1,6 +1,6 @@
 /*
- * author:Paweł Łapacz
- * licence:free
+ * author:plapacz6@gmail.com
+ * licence:GPLv3
  * data:2020-03-30
  * ver:0.0.1
  *

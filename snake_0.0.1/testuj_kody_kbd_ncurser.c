@@ -1,3 +1,8 @@
+ /*
+ * author:plapacz6@gmail.com
+ * licence:GPLv3
+ */
+
 #include <ncurses.h>
 
 int TESTUJ_KODY_KLAWISZY(){
@@ -5,6 +10,8 @@ int TESTUJ_KODY_KLAWISZY(){
 //z ncurses.h KEY_... zgadza sie ostatnie 2 cyfry,Tzn. up:0403 103
   int key;
     while(1){
+      mvprintw(3, 4, "press a key (function, arrow, alpha) (ESC x 2 == end)");
+
       uint16_t kod;
       uint8_t kodL;
       uint8_t kodH;
@@ -13,7 +20,7 @@ int TESTUJ_KODY_KLAWISZY(){
       kodL = kod;
       kodH = kod>>8;
  
-      mvprintw(3, 3,
+      mvprintw(5, 4,
           "%0x == %u == %i == %x KOD[%u: %u %u]\n",
           (int)key, 
           (unsigned)key, 
@@ -25,17 +32,18 @@ int TESTUJ_KODY_KLAWISZY(){
     }
     return key;
 }
-
+#ifdef TEST
 int main(){
   initscr();
-  timeout(3); //-1 blokowanie getchar(), 
+  timeout(-1); //-1 blokowanie getchar(), 
               //>0 - bez blokowania - odczyt natychmiast
-  raw():    //bez buforowania
-  kaypad(stdscr, TRUE); //właczenie FunctionKey, Arrows
+  raw();      //bez buforowania
+  keypad(stdscr, TRUE); //właczenie FunctionKey, Arrows
   noecho();   //echo off
-  mvprintw(0, 2, "ncurses gotowe ... COLS == %d, LINES == %d", COLS, LINES);
+  mvprintw(1, 4, "ncurses gotowe ... COLS == %d, LINES == %d", COLS, LINES);
 
   TESTUJ_KODY_KLAWISZY();
 
-  endwin(); //zakniecie ncurses
+  endwin(); //zamkniecie ncurses
 }
+#endif //TEST

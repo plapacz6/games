@@ -1,6 +1,6 @@
 /*
- * author:Paweł Łapacz
- * licence:free
+ * author:plapacz6@gmail.com
+ * licence:GPLv3
  * data:2020-05-28
  * ver:0.0.1
  *
@@ -12,7 +12,6 @@
  * snake's logic
  */
 
-#include "main.h"
 #include "game.h"
 #include "snake.h"
 
