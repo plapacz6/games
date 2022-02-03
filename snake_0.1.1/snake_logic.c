@@ -7,18 +7,22 @@
 #include "game_logic.h"
 #include "snake_logic.h"
 #include "apples.h"
+/**
+ * @brief 
+ * 
+ */
 extern screen_t screen;
 extern apples_t apples;
 extern game_cfg_t game_cfg;
 
-//preparing snake to move
+
 void snake_move_forward(snake_t *psn, coords_t *pc, bool growth){
   int i;
-  /*
-     Moving snake forward:
-     Changing the coordinates of each part of the snake
-     to the coordinates of the part following it,
-     and moving head of the snake to the coordinases == pc.
+  /**
+   * Moving snake forward:
+   * Changing the coordinates of each part of the snake
+   * to the coordinates of the part following it,
+   * and moving head of the snake to the coordinases == pc.
   */
   if(growth == true){
     if(psn->length < game_cfg.snake_max_length[psn->id] - 1){
@@ -32,6 +36,7 @@ void snake_move_forward(snake_t *psn, coords_t *pc, bool growth){
   psn->x[0] = pc->x;
   psn->y[0] = pc->y;
 }
+
 
 int snake_growth_N_and_move_forward_N(snake_t *psn, int n){
   coords_t coords;
@@ -52,9 +57,7 @@ int snake_growth_N_and_move_forward_N(snake_t *psn, int n){
   return growth_impossible;
 }
 
-/** the snake grows from the tail, the head does not move
- * (finds random places for growth that do not collide with other board objects)
- */
+/*  //NOT USED
 int snake_growth_tail_N(snake_t *psn, size_t n){
   screen_t sc = screen;
   apples_t as = apples;
@@ -63,7 +66,7 @@ int snake_growth_tail_N(snake_t *psn, size_t n){
   int dx; //direction and growth step
   int dy;
   int i;
-  int j;
+  int j; //UNUSED
   bool gotowe = false;
   bool kolizja = false;
   do{
@@ -81,6 +84,7 @@ int snake_growth_tail_N(snake_t *psn, size_t n){
     }
   } while(gotowe != true);
 }
+*/
 
 void init_snake(snake_t *psn, int id, size_t length){
   psn->id = id;

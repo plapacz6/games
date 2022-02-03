@@ -6,6 +6,13 @@
 #include "menu_definitions.h"
 #include "menu_UI.h"
 
+#define MALLOC_DEBUG
+  #ifdef MALLOC_DEBUG
+  #include <stdio.h>  
+  #define PMALLOC() {fprintf(stderr, "malloc in file %s line %d\n", __FILE__, __LINE__);}
+  #else
+  PMALLOC() {}
+  #endif
 /** description of the buffers of one menu item
  */
 typedef struct {
@@ -117,6 +124,8 @@ void create_menu(menu_t *pm){
     * structures describing the buffers of one menu item
     * written to a pointer on this structure.
    */
+  
+  PMALLOC();
   menus_bufors[pm->id_menu].item_bufor2 = malloc(pm->number_of_items *
                              sizeof(menu_item_bufor2_t*));
   //calculation of the y coordinate of the menu
@@ -134,8 +143,11 @@ void create_menu(menu_t *pm){
                 + 1;
     //creating a buffer for one menu item (buffer for text and underneath)
     //!!! IT FALLS HERE. Should there be (dot) instead of (arrow) ->. ???
+    PMALLOC();
     menus_bufors[pm->id_menu].item_bufor2[i] = malloc(sizeof(menu_item_bufor2_t));
+    PMALLOC();
     menus_bufors[pm->id_menu].item_bufor2[i]->text = malloc(bufor_len * sizeof(int));
+    PMALLOC();
     menus_bufors[pm->id_menu].item_bufor2[i]->covered = malloc(bufor_len * sizeof(int));
     menus_bufors[pm->id_menu].item_bufor2[i]->bufor_len = bufor_len;
     //set the x-coordinate of the menu item, and the y-coordinate
@@ -152,6 +164,7 @@ void create_menu(menu_t *pm){
       MARGIN_R,
       MENU_ITEM_FRAME_R
     );
+    PMALLOC();
     menus_bufors[pm->id_menu].item_bufor2[i]->covered = malloc(bufor_len * sizeof(int));
     /* at the creation stage, it makes no sense to write down the background, 
      * because it will be different when called up
@@ -165,7 +178,8 @@ void create_menu(menu_t *pm){
       menus_bufors[pm->id_menu].item_bufor2[i]->xy.x +
       menus_bufors[pm->id_menu].item_bufor2[i]->bufor_len
     );
-    */
+    /* 
+    */    
   }
 }
 

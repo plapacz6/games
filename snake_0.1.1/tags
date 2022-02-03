@@ -5,7 +5,7 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 APPLES_H	apples.h	2;"	d
-CFLAGS	Makefile	/^CFLAGS=-Wall -g$/;"	m
+CFLAGS	Makefile	/^CFLAGS=-Wall -g3 -fsanitize=address$/;"	m
 COLLISION_WITH_APPLE	game_logic.h	/^  COLLISION_WITH_APPLE,        \/\/snake growth +1$/;"	e	enum:type_of_collision_tt
 COLLISION_WITH_BORDER	game_logic.h	/^  COLLISION_WITH_BORDER = 1,$/;"	e	enum:type_of_collision_tt
 COLLISION_WITH_ONESELF	game_logic.h	/^  COLLISION_WITH_ONESELF,$/;"	e	enum:type_of_collision_tt
@@ -47,6 +47,7 @@ M3_END	game_menu_definition.h	/^  M3_END,$/;"	e	enum:user_choice_tt
 M3_END	test_menu_definition.h	/^  M3_END,$/;"	e	enum:user_choice_enum_t
 M3_RESTART	game_menu_definition.h	/^  M3_RESTART,$/;"	e	enum:user_choice_tt
 M3_RESTART	test_menu_definition.h	/^  M3_RESTART,$/;"	e	enum:user_choice_enum_t
+MALLOC_DEBUG	menu_UI.c	9;"	d	file:
 MAX_LEN_SNAKE	game_logic.h	7;"	d
 MAX_NUMBER_APPLES	game_logic.h	6;"	d
 MAX_NUMBER_OF_MENU	game_menu_definition.h	9;"	d
@@ -61,6 +62,8 @@ MODE_COLLISION_ONESLEF	snake_logic.h	/^  MODE_COLLISION_ONESLEF = 1,$/;"	e	enum:
 MODE_COLLISION_OTHER_SNAKE	snake_logic.h	/^  MODE_COLLISION_OTHER_SNAKE = 4,$/;"	e	enum:mode_of_snake_tt
 MODE_COLLISION_WALL	snake_logic.h	/^  MODE_COLLISION_WALL = 3,$/;"	e	enum:mode_of_snake_tt
 NO_COLLISION	game_logic.h	/^  NO_COLLISION = 0,$/;"	e	enum:type_of_collision_tt
+PMALLOC	menu_UI.c	/^  PMALLOC() {}$/;"	f
+PMALLOC	menu_UI.c	12;"	d	file:
 PRINT_DEBUG	game_UI.c	/^void PRINT_DEBUG(snake_t *psn, int key){$/;"	f
 SNAKE_LOGIC_H	snake_logic.h	3;"	d
 TEST_MENU_DEFINITION_H	test_menu_definition.h	2;"	d
@@ -82,7 +85,7 @@ collision	game_UI.h	/^  char* collision;$/;"	m	struct:__anon4
 collision_detect	game_logic.c	/^type_of_collision_t  collision_detect($/;"	f
 coords_t	init_UI.h	/^} coords_t;$/;"	t	typeref:struct:coords_tt
 coords_tt	init_UI.h	/^typedef struct coords_tt {$/;"	s
-covered	menu_UI.c	/^  int *covered;  \/\/part of screen covered by textx$/;"	m	struct:__anon1	file:
+covered	menu_UI.c	/^  int *covered;    \/\/part of screen covered by textx$/;"	m	struct:__anon1	file:
 create_menu	menu_UI.c	/^void create_menu(menu_t *pm){$/;"	f
 destroy_menu	menu_UI.c	/^void destroy_menu(menu_t *pm){$/;"	f
 draw_apples	game_UI.c	/^void draw_apples(){$/;"	f
@@ -122,11 +125,11 @@ init_apples	apples.c	/^void init_apples(){$/;"	f
 init_globals_1	game_logic.c	/^void init_globals_1(){$/;"	f
 init_globals_2	game_UI.c	/^void init_globals_2(){$/;"	f
 init_snake	snake_logic.c	/^void init_snake(snake_t *psn, int id, size_t length){$/;"	f
-item_bufor2	menu_UI.c	/^  menu_item_bufor2_t **item_bufor2; \/\/tablica wkaznikow do buforow poszczegolnych pozycji menu$/;"	m	struct:__anon2	file:
+item_bufor2	menu_UI.c	/^  menu_item_bufor2_t **item_bufor2; \/\/an array of pointers to the buffers of the individual menu items$/;"	m	struct:__anon2	file:
 item_description	menu_logic.h	/^  const char* item_description;$/;"	m	struct:menu_item_tt
 item_id	menu_logic.h	/^  const int item_id;$/;"	m	struct:menu_item_tt
 item_name	menu_logic.h	/^  const char* item_name;$/;"	m	struct:menu_item_tt
-items	menu_logic.h	/^  const menu_item_t const *items;$/;"	m	struct:menu_tt
+items	menu_logic.h	/^  const menu_item_t* const items;$/;"	m	struct:menu_tt
 its_time_to_move	game_logic.c	/^bool its_time_to_move(){$/;"	f
 len	apples.h	/^  size_t len;$/;"	m	struct:apples_tt
 length	snake_logic.h	/^  int length;$/;"	m	struct:snake_tt
@@ -152,7 +155,7 @@ menu_items_bufors_t	menu_UI.c	/^} menu_items_bufors_t;$/;"	t	typeref:struct:__an
 menu_t	menu_logic.h	/^} menu_t;$/;"	t	typeref:struct:menu_tt
 menu_title	menu_logic.h	/^  const char *menu_title;$/;"	m	struct:menu_tt
 menu_tt	menu_logic.h	/^typedef struct menu_tt{$/;"	s
-menus_bufors	menu_UI.c	/^menu_items_bufors_t menus_bufors[MAX_NUMBER_OF_MENU]; \/\/zamiast listy,  globalna wiec wyzerowana$/;"	v
+menus_bufors	menu_UI.c	/^menu_items_bufors_t menus_bufors[MAX_NUMBER_OF_MENU]; \/\/<- instead of a list; global so reset$/;"	v
 mode_of_snake_t	snake_logic.h	/^} mode_of_snake_t;$/;"	t	typeref:enum:mode_of_snake_tt
 mode_of_snake_tt	snake_logic.h	/^typedef enum mode_of_snake_tt{$/;"	g
 nr_ruchu	game_UI.c	/^int nr_ruchu = 0;$/;"	v
@@ -170,7 +173,6 @@ screen_tt	init_UI.h	/^typedef struct screen_tt{$/;"	s
 show_menu	menu_UI.c	/^void show_menu(menu_t *pm){$/;"	f
 snake_body	game_UI.h	/^  char* snake_body;$/;"	m	struct:__anon4
 snake_growth_N_and_move_forward_N	snake_logic.c	/^int snake_growth_N_and_move_forward_N(snake_t *psn, int n){$/;"	f
-snake_growth_tail_N	snake_logic.c	/^int snake_growth_tail_N(snake_t *psn, size_t n){$/;"	f
 snake_max_length	game_logic.h	/^  size_t snake_max_length[1];$/;"	m	struct:game_cfg_tt
 snake_move_forward	snake_logic.c	/^void snake_move_forward(snake_t *psn, coords_t *pc, bool growth){$/;"	f
 snake_t	snake_logic.h	/^} snake_t;$/;"	t	typeref:struct:snake_tt
@@ -179,7 +181,7 @@ speed	game_logic.h	/^  size_t speed;$/;"	m	struct:game_cfg_tt
 targedUI	Makefile	/^targedUI=NCURSES$/;"	m
 targetGAME	Makefile	/^targetGAME=GAME_MENU$/;"	m
 targetTEST	Makefile	/^targetTEST=TEST_MENU$/;"	m
-text	menu_UI.c	/^  char *text;     \/\/text menu's item$/;"	m	struct:__anon1	file:
+text	menu_UI.c	/^  char *text;      \/\/text menu's item$/;"	m	struct:__anon1	file:
 time_tv	game_logic.h	/^  struct timeval time_tv;$/;"	m	struct:game_time_control_tt	typeref:struct:game_time_control_tt::timeval
 time_unit	game_logic.h	/^  unsigned long time_unit;$/;"	m	struct:game_time_control_tt
 type_of_collision_t	game_logic.h	/^} type_of_collision_t;$/;"	t	typeref:enum:type_of_collision_tt
@@ -197,7 +199,7 @@ x	snake_logic.h	/^  int x[MAX_LEN_SNAKE];$/;"	m	struct:snake_tt
 xmax	init_UI.h	/^  int xmax;$/;"	m	struct:screen_tt
 xmid	init_UI.h	/^  int xmid; \/\/center of screen x$/;"	m	struct:screen_tt
 xmin	init_UI.h	/^  int xmin;  \/\/left upper x$/;"	m	struct:screen_tt
-xy	menu_UI.c	/^  coords_t xy;     \/\/wspolrzedne poczatku pozycji na ekranie$/;"	m	struct:__anon1	file:
+xy	menu_UI.c	/^  coords_t xy;     \/\/coordinates of the beginning of the item on the screen$/;"	m	struct:__anon1	file:
 y	apples.h	/^  int y;$/;"	m	struct:apple_tt
 y	init_UI.h	/^  int y;$/;"	m	struct:coords_tt
 y	snake_logic.h	/^  int y[MAX_LEN_SNAKE];$/;"	m	struct:snake_tt

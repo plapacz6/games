@@ -4,3 +4,7 @@
  * data:2020-06-30
  * ver:0.1.1
  */
+
+on ubuntu 14, 18
+ sudo apt-get install libncurses5-dev libncursesw5-dev
+ make

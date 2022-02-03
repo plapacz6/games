@@ -87,8 +87,8 @@ type_of_collision_t  collision_detect(
   }
 
   //Checking for collision with obstackles:
-  //TODO: przeszkody alokowane dynamicznie na stercie
-  //i kazda ma wlasne wspolrzedne i dlugosc i ksztalt
+  //TODO: obstacles are to be allocated dynamically on the heap
+  //and each should have its own coordinate, length and shape
   //  return COLLISION_WITH_WALL;
 
   //Checking for collisions with other snake:
@@ -112,7 +112,7 @@ type_of_collision_t  collision_detect(
 void game_move(snake_t *psn, game_state_t *pgame_state){
   coords_t coords;
   coords_t *pc = &coords;
-  screen_t *psc = &screen;
+  //screen_t *psc = &screen;  //UNUSED
   type_of_collision_t collision_type;
   //checking time period
   if(its_time_to_move()){
@@ -275,7 +275,8 @@ void game_start(){
         break;
 
       case gs_cfg:
-        draw_cfg(&game_cfg.speed, &game_cfg.snake_max_length);
+        /*temporary and not correct handling cfg changing - what if there will be 2 snakes? */
+        draw_cfg(&game_cfg.speed, &(game_cfg.snake_max_length[game_cfg.number_of_snake]));
         g_time.time_unit = 300000/game_cfg.speed; //in micro seconds
         game_state = gs_start;
         break;

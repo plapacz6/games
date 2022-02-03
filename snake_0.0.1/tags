@@ -5,64 +5,64 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 CFLAGS	Makefile	/^CFLAGS=-Wall -g$/;"	m
-COLLISION_WITH_APPLE	game.c	/^  COLLISION_WITH_APPLE,        \/\/snake growth +1$/;"	e	enum:__anon8	file:
-COLLISION_WITH_BORDER	game.c	/^  COLLISION_WITH_BORDER = 1,$/;"	e	enum:__anon8	file:
-COLLISION_WITH_ONESELF	game.c	/^  COLLISION_WITH_ONESELF, $/;"	e	enum:__anon8	file:
-COLLISION_WITH_OTHER_SNAKE	game.c	/^  COLLISION_WITH_OTHER_SNAKE,$/;"	e	enum:__anon8	file:
-COLLISION_WITH_WALL	game.c	/^  COLLISION_WITH_WALL, $/;"	e	enum:__anon8	file:
+COLLISION_WITH_APPLE	game.c	/^  COLLISION_WITH_APPLE,        \/\/snake growth +1$/;"	e	enum:__anon4	file:
+COLLISION_WITH_BORDER	game.c	/^  COLLISION_WITH_BORDER = 1,$/;"	e	enum:__anon4	file:
+COLLISION_WITH_ONESELF	game.c	/^  COLLISION_WITH_ONESELF, $/;"	e	enum:__anon4	file:
+COLLISION_WITH_OTHER_SNAKE	game.c	/^  COLLISION_WITH_OTHER_SNAKE,$/;"	e	enum:__anon4	file:
+COLLISION_WITH_WALL	game.c	/^  COLLISION_WITH_WALL, $/;"	e	enum:__anon4	file:
 HEADERS	Makefile	/^HEADERS=snake_types.h #game.h snake.h$/;"	m
-IDX_BOARD_D	game.c	/^  IDX_BOARD_D = 3,$/;"	e	enum:__anon9	file:
-IDX_BOARD_L	game.c	/^  IDX_BOARD_L = 6,$/;"	e	enum:__anon9	file:
-IDX_BOARD_LD	game.c	/^  IDX_BOARD_LD = 1,$/;"	e	enum:__anon9	file:
-IDX_BOARD_LU	game.c	/^  IDX_BOARD_LU = 0,$/;"	e	enum:__anon9	file:
-IDX_BOARD_R	game.c	/^  IDX_BOARD_R = 7,$/;"	e	enum:__anon9	file:
-IDX_BOARD_RD	game.c	/^  IDX_BOARD_RD = 5,$/;"	e	enum:__anon9	file:
-IDX_BOARD_RU	game.c	/^  IDX_BOARD_RU = 4,$/;"	e	enum:__anon9	file:
-IDX_BOARD_U	game.c	/^  IDX_BOARD_U = 2,$/;"	e	enum:__anon9	file:
-IDX_COLLISION_BORDER	game.c	/^  IDX_COLLISION_BORDER = 1,$/;"	e	enum:__anon9	file:
-IDX_COLLISION_ONESLEF	game.c	/^  IDX_COLLISION_ONESLEF = 0,$/;"	e	enum:__anon9	file:
-IDX_COLLISION_OTHER_SNAKE	game.c	/^  IDX_COLLISION_OTHER_SNAKE = 3,$/;"	e	enum:__anon9	file:
-IDX_COLLISION_WALL	game.c	/^  IDX_COLLISION_WALL = 2,$/;"	e	enum:__anon9	file:
-IDX_SNAKE_BODY	game.c	/^  IDX_SNAKE_BODY = 1,$/;"	e	enum:__anon9	file:
-IDX_SNAKE_ERASE	game.c	/^  IDX_SNAKE_ERASE = 2,$/;"	e	enum:__anon9	file:
-IDX_SNAKE_HEAD	game.c	/^  IDX_SNAKE_HEAD = 0,$/;"	e	enum:__anon9	file:
+IDX_BOARD_D	game.c	/^  IDX_BOARD_D = 3,$/;"	e	enum:__anon5	file:
+IDX_BOARD_L	game.c	/^  IDX_BOARD_L = 6,$/;"	e	enum:__anon5	file:
+IDX_BOARD_LD	game.c	/^  IDX_BOARD_LD = 1,$/;"	e	enum:__anon5	file:
+IDX_BOARD_LU	game.c	/^  IDX_BOARD_LU = 0,$/;"	e	enum:__anon5	file:
+IDX_BOARD_R	game.c	/^  IDX_BOARD_R = 7,$/;"	e	enum:__anon5	file:
+IDX_BOARD_RD	game.c	/^  IDX_BOARD_RD = 5,$/;"	e	enum:__anon5	file:
+IDX_BOARD_RU	game.c	/^  IDX_BOARD_RU = 4,$/;"	e	enum:__anon5	file:
+IDX_BOARD_U	game.c	/^  IDX_BOARD_U = 2,$/;"	e	enum:__anon5	file:
+IDX_COLLISION_BORDER	game.c	/^  IDX_COLLISION_BORDER = 1,$/;"	e	enum:__anon5	file:
+IDX_COLLISION_ONESLEF	game.c	/^  IDX_COLLISION_ONESLEF = 0,$/;"	e	enum:__anon5	file:
+IDX_COLLISION_OTHER_SNAKE	game.c	/^  IDX_COLLISION_OTHER_SNAKE = 3,$/;"	e	enum:__anon5	file:
+IDX_COLLISION_WALL	game.c	/^  IDX_COLLISION_WALL = 2,$/;"	e	enum:__anon5	file:
+IDX_SNAKE_BODY	game.c	/^  IDX_SNAKE_BODY = 1,$/;"	e	enum:__anon5	file:
+IDX_SNAKE_ERASE	game.c	/^  IDX_SNAKE_ERASE = 2,$/;"	e	enum:__anon5	file:
+IDX_SNAKE_HEAD	game.c	/^  IDX_SNAKE_HEAD = 0,$/;"	e	enum:__anon5	file:
 MAX_LEN_SNAKE	game.c	40;"	d	file:
 MAX_NUMBER_APPLES	game.c	39;"	d	file:
-NO_COLLISION	game.c	/^  NO_COLLISION = 0,$/;"	e	enum:__anon8	file:
+NO_COLLISION	game.c	/^  NO_COLLISION = 0,$/;"	e	enum:__anon4	file:
 OBJECTS	Makefile	/^OBJECTS=main.o game.o #snake.o$/;"	m
 PRINT_DEBUG	game.c	/^void PRINT_DEBUG(snake_t *psn, int key){$/;"	f
 SNAKE_TYPES_H	snake_types.h	11;"	d
 TESTUJ_KODY_KLAWISZY	testuj_kody_kbd_ncurser.c	/^int TESTUJ_KODY_KLAWISZY(){$/;"	f
-a	game.c	/^  apple_t a[MAX_NUMBER_APPLES];$/;"	m	struct:__anon12	file:
+a	game.c	/^  apple_t a[MAX_NUMBER_APPLES];$/;"	m	struct:__anon8	file:
 animation_bottom_coords	game.c	/^coords_t animation_bottom_coords;$/;"	v
 animation_frames_STAR	game.c	/^char *animation_frames_STAR = "\/-\\\\|";$/;"	v
 animation_size	game.c	/^size_t animation_size;$/;"	v
-apple_t	game.c	/^} apple_t;$/;"	t	typeref:struct:__anon11	file:
+apple_t	game.c	/^} apple_t;$/;"	t	typeref:struct:__anon7	file:
 apples	game.c	/^apples_t apples;$/;"	v
-apples_t	game.c	/^} apples_t;$/;"	t	typeref:struct:__anon12	file:
-board	snake_types.h	/^  int board;  \/\/board: empty or various obstacles$/;"	m	struct:__anon3
-board_border	game.c	/^  char* board_border;$/;"	m	struct:__anon10	file:
-board_t	snake_types.h	/^} board_t;$/;"	t	typeref:struct:__anon4
+apples_t	game.c	/^} apples_t;$/;"	t	typeref:struct:__anon8	file:
+board	snake_types.h	/^  int board;  \/\/board: empty or various obstacles$/;"	m	struct:__anon11
+board_border	game.c	/^  char* board_border;$/;"	m	struct:__anon6	file:
+board_t	snake_types.h	/^} board_t;$/;"	t	typeref:struct:__anon12
 cfg_edit	main.c	/^void cfg_edit(void){$/;"	f
-collision	game.c	/^  char* collision;$/;"	m	struct:__anon10	file:
+collision	game.c	/^  char* collision;$/;"	m	struct:__anon6	file:
 collision_detect	game.c	/^type_of_collision_t  collision_detect($/;"	f
 coords	game.c	/^coords_t coords; \/\/uniwersal variable for coordynates of screen$/;"	v
-coords_t	game.c	/^} coords_t;$/;"	t	typeref:struct:__anon7	file:
+coords_t	game.c	/^} coords_t;$/;"	t	typeref:struct:__anon3	file:
 draw_board	game.c	/^void draw_board(state_of_game_t *state_of_game){  $/;"	f
 draw_snake	game.c	/^void draw_snake(snake_t* ps, char snake_head_symbol){$/;"	f
-dx	game.c	/^  int dx;  \/\/step in x asix$/;"	m	struct:__anon5	file:
-dy	game.c	/^  int dy;$/;"	m	struct:__anon5	file:
+dx	game.c	/^  int dx;  \/\/step in x asix$/;"	m	struct:__anon1	file:
+dy	game.c	/^  int dy;$/;"	m	struct:__anon1	file:
 game_move	game.c	/^void game_move(snake_t *psn,$/;"	f
 game_start	game.c	/^void game_start(state_of_game_t *state_of_game){$/;"	f
-game_state_t	snake_types.h	/^} game_state_t;$/;"	t	typeref:enum:__anon2
+game_state_t	snake_types.h	/^} game_state_t;$/;"	t	typeref:enum:__anon10
 graphic_symbol	game.c	/^graphic_symbol_t graphic_symbol;$/;"	v
-graphic_symbol_index_t	game.c	/^} graphic_symbol_index_t;$/;"	t	typeref:enum:__anon9	file:
-graphic_symbol_t	game.c	/^} graphic_symbol_t;$/;"	t	typeref:struct:__anon10	file:
-gs_beginning	snake_types.h	/^  gs_beginning,$/;"	e	enum:__anon2
-gs_end	snake_types.h	/^  gs_end$/;"	e	enum:__anon2
-gs_go	snake_types.h	/^  gs_go, $/;"	e	enum:__anon2
-gs_over	snake_types.h	/^  gs_over,$/;"	e	enum:__anon2
-gs_pausa	snake_types.h	/^  gs_pausa, $/;"	e	enum:__anon2
+graphic_symbol_index_t	game.c	/^} graphic_symbol_index_t;$/;"	t	typeref:enum:__anon5	file:
+graphic_symbol_t	game.c	/^} graphic_symbol_t;$/;"	t	typeref:struct:__anon6	file:
+gs_beginning	snake_types.h	/^  gs_beginning,$/;"	e	enum:__anon10
+gs_end	snake_types.h	/^  gs_end$/;"	e	enum:__anon10
+gs_go	snake_types.h	/^  gs_go, $/;"	e	enum:__anon10
+gs_over	snake_types.h	/^  gs_over,$/;"	e	enum:__anon10
+gs_pausa	snake_types.h	/^  gs_pausa, $/;"	e	enum:__anon10
 info_bottom_coords	game.c	/^coords_t info_bottom_coords;$/;"	v
 info_center_coords	game.c	/^coords_t info_center_coords;$/;"	v
 info_empty_space	game.c	/^char *info_empty_space = $/;"	v
@@ -71,16 +71,16 @@ init_globals	game.c	/^void init_globals(){$/;"	f
 init_ncurses	game.c	/^void init_ncurses(){$/;"	f
 init_snake	game.c	/^void init_snake(snake_t *psn){$/;"	f
 its_time_to_move	game.c	/^bool its_time_to_move(){$/;"	f
-len	game.c	/^  size_t len;$/;"	m	struct:__anon12	file:
-length	game.c	/^  int length;$/;"	m	struct:__anon5	file:
+len	game.c	/^  size_t len;$/;"	m	struct:__anon8	file:
+length	game.c	/^  int length;$/;"	m	struct:__anon1	file:
 main	main.c	/^int  main(int argc, char** argv){$/;"	f
 main	testuj_kody_kbd_ncurser.c	/^int main(){$/;"	f
 menu1	main.c	/^menu_state_t menu1(void){$/;"	f
-menu_state_t	snake_types.h	/^} menu_state_t;$/;"	t	typeref:enum:__anon1
-ms_cfg	snake_types.h	/^  ms_cfg, $/;"	e	enum:__anon1
-ms_end	snake_types.h	/^  ms_end$/;"	e	enum:__anon1
-ms_game	snake_types.h	/^  ms_game, $/;"	e	enum:__anon1
-ms_menu	snake_types.h	/^  ms_menu,$/;"	e	enum:__anon1
+menu_state_t	snake_types.h	/^} menu_state_t;$/;"	t	typeref:enum:__anon9
+ms_cfg	snake_types.h	/^  ms_cfg, $/;"	e	enum:__anon9
+ms_end	snake_types.h	/^  ms_end$/;"	e	enum:__anon9
+ms_game	snake_types.h	/^  ms_game, $/;"	e	enum:__anon9
+ms_menu	snake_types.h	/^  ms_menu,$/;"	e	enum:__anon9
 nr_ruchu	game.c	/^int nr_ruchu = 0;$/;"	v
 papples	game.c	/^apples_t *papples = &apples;$/;"	v
 prev_time_s	game.c	/^int prev_time_s;$/;"	v
@@ -89,27 +89,27 @@ print_bottom_animation	game.c	/^void print_bottom_animation(char *frames){$/;"	f
 print_bottom_info	game.c	/^void print_bottom_info(char *str, bool erase){$/;"	f
 print_center_info	game.c	/^void print_center_info(char *str, bool erase){$/;"	f
 screen	game.c	/^screen_t screen;  \/\/game has one screen only$/;"	v
-screen_t	game.c	/^} screen_t;$/;"	t	typeref:struct:__anon6	file:
+screen_t	game.c	/^} screen_t;$/;"	t	typeref:struct:__anon2	file:
 show_help	main.c	/^menu_state_t show_help(int argc, char** argv){$/;"	f
-snake_body	game.c	/^  char* snake_body;$/;"	m	struct:__anon10	file:
+snake_body	game.c	/^  char* snake_body;$/;"	m	struct:__anon6	file:
 snake_growth_N_and_move_forward_N	game.c	/^int snake_growth_N_and_move_forward_N(snake_t *psn, int n){ $/;"	f
 snake_move_forward	game.c	/^void snake_move_forward(snake_t *ps, coords_t *pc, bool growth){$/;"	f
-snake_t	game.c	/^} snake_t;$/;"	t	typeref:struct:__anon5	file:
-speed	snake_types.h	/^  int speed;$/;"	m	struct:__anon3
+snake_t	game.c	/^} snake_t;$/;"	t	typeref:struct:__anon1	file:
+speed	snake_types.h	/^  int speed;$/;"	m	struct:__anon11
 state_of_game	snake_types.h	/^state_of_game_t state_of_game;$/;"	v
-state_of_game_t	snake_types.h	/^} state_of_game_t;$/;"	t	typeref:struct:__anon3
+state_of_game_t	snake_types.h	/^} state_of_game_t;$/;"	t	typeref:struct:__anon11
 time_tv	game.c	/^struct timeval time_tv;$/;"	v	typeref:struct:timeval
 time_unit	game.c	/^unsigned long time_unit;$/;"	v
-type_of_collision_t	game.c	/^} type_of_collision_t;$/;"	t	typeref:enum:__anon8	file:
-x	game.c	/^  int x;$/;"	m	struct:__anon11	file:
+type_of_collision_t	game.c	/^} type_of_collision_t;$/;"	t	typeref:enum:__anon4	file:
+x	game.c	/^  int x;$/;"	m	struct:__anon3	file:
 x	game.c	/^  int x;$/;"	m	struct:__anon7	file:
-x	game.c	/^  int x[MAX_LEN_SNAKE];$/;"	m	struct:__anon5	file:
-xmax	game.c	/^  int xmax;$/;"	m	struct:__anon6	file:
-xmid	game.c	/^  int xmid; \/\/center of screen x$/;"	m	struct:__anon6	file:
-xmin	game.c	/^  int xmin;  \/\/left upper x$/;"	m	struct:__anon6	file:
-y	game.c	/^  int y;$/;"	m	struct:__anon11	file:
+x	game.c	/^  int x[MAX_LEN_SNAKE];$/;"	m	struct:__anon1	file:
+xmax	game.c	/^  int xmax;$/;"	m	struct:__anon2	file:
+xmid	game.c	/^  int xmid; \/\/center of screen x$/;"	m	struct:__anon2	file:
+xmin	game.c	/^  int xmin;  \/\/left upper x$/;"	m	struct:__anon2	file:
+y	game.c	/^  int y;$/;"	m	struct:__anon3	file:
 y	game.c	/^  int y;$/;"	m	struct:__anon7	file:
-y	game.c	/^ int y[MAX_LEN_SNAKE];$/;"	m	struct:__anon5	file:
-ymax	game.c	/^  int ymax;$/;"	m	struct:__anon6	file:
-ymid	game.c	/^  int ymid;$/;"	m	struct:__anon6	file:
-ymin	game.c	/^  int ymin;$/;"	m	struct:__anon6	file:
+y	game.c	/^ int y[MAX_LEN_SNAKE];$/;"	m	struct:__anon1	file:
+ymax	game.c	/^  int ymax;$/;"	m	struct:__anon2	file:
+ymid	game.c	/^  int ymid;$/;"	m	struct:__anon2	file:
+ymin	game.c	/^  int ymin;$/;"	m	struct:__anon2	file:

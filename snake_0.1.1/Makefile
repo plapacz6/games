@@ -1,4 +1,4 @@
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g3 -fsanitize=address
 
 GAME_HEADERS=\
 game_logic.h game_UI.h init_UI.h snake_logic.h apples.h\

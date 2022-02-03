@@ -12,7 +12,7 @@ typedef struct menu_item_tt{
 typedef struct menu_tt{
   const size_t id_menu;
   const size_t number_of_items;
-  const menu_item_t const *items;
+  const menu_item_t* const items;
   const char *menu_title;
 } menu_t;
 
