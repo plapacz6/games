@@ -2,21 +2,23 @@
 #define TEST_MENU_DEFINITION_H
 
 #include "menu_logic.h"
-/* definicje menu */
+/* menu definitions */
 
-//ilosc roznych menu uzywanych prze gre
+//the number of different menus used by the game
 //extern enum {MAX_NUMBER_OF_MENU = 3};
 #define MAX_NUMBER_OF_MENU (3)
 
 //menu 1:
-//definicja identyfikatorow pozycji  zwracane przez menu i wykorzystywane w logice sterowania gra
+/** definition of identifiers of menu items returned by menus 
+ * and used in the game control logic
+ */
 enum user_choice_enum_t {
-  //menu po uruchomieniu programu
+  //menu after starting the program
   M1_START,
   M1_CFG,
   M1_END,
 
-  //pausa w grze (spacja)
+  //pause in the game (space)
   M2_GO,
   M2_END,
 

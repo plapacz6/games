@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include "menu_logic.h"
 #include "menu_UI.h"
-/** uruchamia menu i zwraca wybor uzytkownika
+/** launches the menu and returns the user selection
 */
 
 int call_menu(menu_t *pm){

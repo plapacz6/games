@@ -30,7 +30,7 @@ void UI_refresh(){
   mvprintw(screen.ymax, 2, "speed = [%i], time_unit = [%i], snake_max_len = [%i] ",
     game_cfg.speed, g_time.time_unit ,game_cfg.snake_max_length[0]);
   #endif //DEBUG
-  //przeniesienie kursora do 'neutralnego miejsca', gdzie nie bedzie raził
+  //move the cursor to a hardly visible place
   move(0,0);
   refresh();
 }
@@ -80,7 +80,7 @@ void draw_apples(){
 void draw_apples_info(){
   int i;
   for(i = 0; i < apples.len; i++){
-    //kolejnosc wyswietlania: x,y
+    //display order: x, y
     mvprintw(screen.ymin, screen.xmin + 5, " apple = [%i, %i] ", apples.a[i].x, apples.a[i].y);
   }
   //refresh();

@@ -16,7 +16,7 @@ typedef struct menu_tt{
   const char *menu_title;
 } menu_t;
 
-/** uruchamia menu i zwraca wybor uzytkownika
+/** launches the menu and returns the user selection
 */
 int call_menu(menu_t *pm);
 /** inicjalizacja menu */

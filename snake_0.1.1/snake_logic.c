@@ -52,15 +52,15 @@ int snake_growth_N_and_move_forward_N(snake_t *psn, int n){
   return growth_impossible;
 }
 
-/*** snake rosnie od strony ogona, głowa sie nie przesuwa
-(wyszukuje losowe niekolizycjne z innymi obiektami planszy miejsca na rozrost)
-*/
+/** the snake grows from the tail, the head does not move
+ * (finds random places for growth that do not collide with other board objects)
+ */
 int snake_growth_tail_N(snake_t *psn, size_t n){
   screen_t sc = screen;
   apples_t as = apples;
   int x;
   int y;
-  int dx; //kierunek i krok rozrostu
+  int dx; //direction and growth step
   int dy;
   int i;
   int j;
@@ -71,9 +71,9 @@ int snake_growth_tail_N(snake_t *psn, size_t n){
     y = psn->y[0];
     gotowe = true;
     for(i = 0; i < n; i++){
-      dx = rand()%2?-1:1;  //-1 lub 1
-      dy = rand()%2?-1:1;  //-1 lub 1
-      //sprawdzenie kolizji z obiektami planszy, jablakim, granicami, snakami, soba
+      dx = rand()%2?-1:1;  //-1 or 1
+      dy = rand()%2?-1:1;  //-1 or 1
+      //Check for collisions with board objects, apples, borders, snaps, and yourself.
       if(kolizja == true){
         gotowe = false;
         break;

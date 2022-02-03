@@ -4,13 +4,13 @@
 #include "menu_logic.h"   //user_choice_t, menu_t
 #include "menu_definitions.h"
 
-//pokazuje / ukrywa menu
+//shows / hides the menu
 void show_menu(menu_t *pm);
 void hide_menu(menu_t *pm);
 //czeka na wybor
 int wait_for_user_choice(menu_t *pm);
 
-/** inicjalizacja menu */
+/** menu initialization */
 void create_menu(menu_t *pm);
 /** destructor menu */
 void destroy_menu(menu_t *pm);

@@ -1,5 +1,4 @@
-
-
+The first draft of the breakdown of functionality. (Out of date)
 main_ncurses --> main_menu_ncurses, main_menu_logic
   main menu:
     start game
@@ -30,19 +29,31 @@ snake_ --> snake_logic
       - changing speed of snake
 
 
-      /???
-        czy to snake ma obserwowac plansze i sprawdzac czy sie z czyms
-        zderzy lub czy zbliza sie do niego inny snake
+/???
+  Questions for design decisions.
+  Is this snake to watch the boards and check if there is anything
+  collides or whether another snake is approaching it.
 
-        czy to plansza ma monitorowac ruch i ostrzegac lub informowac
-        snaki o zagrorzeniach i rozwoju sytuacji.
-        Tu musiala by pokazywac gdzie jest zderzenie a gdzie bezpieczne (w 
-        zakresie monitoringu) kierunki.
+  Is this the board to monitor traffic and alert or inform?
+  dreams about threats and developments.
+  Here it would have to show where the collision is and where it is safe (v
+  monitoring) directions.
 
-        czy snake ma zadawac zapytania plnaszy o stan w danym kierunku.
-      ???/
-      -- obserwing fraction of board and making decision
-         about changing direction
-      -- checking and tracing approaching snakes
-      -- predicting collisions
-      -- interface for AI
+  Whether the snake is to ask questions about the state in a given direction.
+???/
+-- obserwing fraction of board and making decision
+    about changing direction
+-- checking and tracing approaching snakes
+-- predicting collisions
+-- interface for AI
+
+/**  TODO
+Ideas to consider.
+Each game object has a separate set of files (c, h) (logic, interface).
+Subsystems separately developed and used only here:
+- menu
+- config / save file
+menu:
+- defined in some text file (json) and generated dynamically in memory.
+*/
+

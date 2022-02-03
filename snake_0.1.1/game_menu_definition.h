@@ -1,7 +1,7 @@
 #ifndef GAME_MENU_DEFINITION_H
 #define GAME_MENU_DEFINITION_H
 #include "menu_logic.h"
-#include "menu_UI.h" //przed tym musi być  'game_menu_definition.h" lub 'test_menu_definition.h' wlaczone
+#include "menu_UI.h" //before <-this must be turn on  'game_menu_definition.h" or 'test_menu_definition.h'
 
 /* definicje menu */
 
@@ -9,15 +9,15 @@
 #define MAX_NUMBER_OF_MENU (3)
 
 //menu 1:
-//definicja identyfikatorow pozycji  zwracane przez menu i wykorzystywane w logice sterowania gra
+//menu item identifiers used in the game control logic
 //typedef unsigned user_choice_t;
 typedef enum user_choice_tt{
-  //menu po uruchomieniu programu
+  //menu after program starts
   M1_START,
   M1_CFG,
   M1_END,
 
-  //pausa w grze (spacja)
+  //pause in the game (spacja)
   M2_CONTINUE,
   M2_RESTART,
 

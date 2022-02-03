@@ -6,17 +6,19 @@
 #include "menu_definitions.h"
 #include "menu_UI.h"
 
-//opis buforow jednej pozycji menu
+/** description of the buffers of one menu item
+ */
 typedef struct {
-  char *text;     //text menu's item
-  int *covered;  //part of screen covered by textx
-  coords_t xy;     //wspolrzedne poczatku pozycji na ekranie
+  char *text;      //text menu's item
+  int *covered;    //part of screen covered by textx
+  coords_t xy;     //coordinates of the beginning of the item on the screen
   size_t bufor_len;
 } menu_item_bufor2_t;
 
-//opis opsow byforwo pozycji dla calego jednego menu
+/**a description of the set of item buffers for all one menu
+ */
 typedef struct {
-  menu_item_bufor2_t **item_bufor2; //tablica wkaznikow do buforow poszczegolnych pozycji menu
+  menu_item_bufor2_t **item_bufor2; //an array of pointers to the buffers of the individual menu items
   //menu_title
   //top_screen_border_tekst
   //bottom_screen_border_tekst
@@ -24,15 +26,17 @@ typedef struct {
 
 extern screen_t screen;
 
-/**  f.pomocnicza wczytujaca zawartosc ekranu ktory bedzie nadpisany przez menu
-     w celu jego przywrocenia po ukryciu menu
-*/
+/** auxiliary function that loads the screen content, 
+ * which will be overwritten by the menu in order to restore it 
+ * after hiding the menu
+ */
 void read_covered_area(char *bufor){
 }
 
-//tablica wskaznikow do opisow poszczegolnych menu
-//#define MAX_NUMBER_OF_MENU = //to zdefinowane tam gdzie definicja menu:
-menu_items_bufors_t menus_bufors[MAX_NUMBER_OF_MENU]; //zamiast listy,  globalna wiec wyzerowana
+/** an array of pointers for the descriptions of individual menus
+ */
+//#define MAX_NUMBER_OF_MENU = //<- this is defined where the menu definition is
+menu_items_bufors_t menus_bufors[MAX_NUMBER_OF_MENU]; //<- instead of a list; global so reset
 extern screen_t screen;
 
 void menu_item_text(char *text,
@@ -55,12 +59,12 @@ void menu_item_text(char *text,
 }
 
 
-/*** wczytuje podaja wpolrzednymi obszar ekreanu do bufora
-  * y1,x1 - lewy gorny rog
-  * y2,x2 - prawy dolny
-  * UWAGA, ale ma to sens tylko dla jednego wiersza, chyba, ze
-  * znamy dlugosc wiersza i mozemy recznie podzielic bufor pozniej
-  * */
+/** reads the specified (in coordinates) screen area into the buffer
+ * y1, x1 - top left corner
+ * y2, x2 - bottom right
+ * NOTE, but it only makes sense for one line, unless
+ * we know the length of the line and can manually break the buffer later
+ */
 int read_screen(int *buf, size_t max_buf, int y1, int x1, int y2, int x2){
    int x, y, i;
    i = 0;
@@ -70,11 +74,11 @@ int read_screen(int *buf, size_t max_buf, int y1, int x1, int y2, int x2){
        buf[i] = inch();
        i++;
        if(i > max_buf){
-         return 2; //zakonczenie spowodowane osiagnieciem max pojemnosci bufora
+         return 2; //termination due to reaching the maximum buffer capacity
        }
      }
    }
-   return 0; //zakonczenie normalne
+   return 0; //normal termination
  }
 int put_readed_screen(int *buf, size_t max_buf, int y1, int x1, int y2, int x2){
    int x, y, i;
@@ -85,17 +89,18 @@ int put_readed_screen(int *buf, size_t max_buf, int y1, int x1, int y2, int x2){
        addch(buf[i]);
        i++;
        if(i > max_buf){
-         return 2; //zakonczenie spowodowane osiagnieciem max pojemnosci bufora
+         return 2; //termination due to reaching the maximum buffer capacity
        }
      }
    }
-   return 0; //zakonczenie normalne
+   return 0; //normal termination
  }
 
 
-/** inicjalizacja menu */
+/** menu initialization
+ */
 void create_menu(menu_t *pm){
-  //elementy stylu menu ncurses - dlatego tutaj,  bo niezmienne
+  //ncurses menu style elements - that's why here, because they do not change
   char *MARGIN_L = "  ";
   char *MARGIN_M = " . ";
   char *MARGIN_R = "  ";
@@ -106,18 +111,19 @@ void create_menu(menu_t *pm){
   size_t i;
   size_t bufor_len;
 
-  //utworzenie wezla buforow dla jenego menu
-  //!!! TU CHYBA JEST WSKAZNIK ???
-  //przydzial pamieci dla tablicy wskaznikow na
-  //strukture opisujcą bufory jednej pozycji menu
-  //zapisany do wskaznika na ta strukture
+  /** Create a buffer set node for one menu.
+    * HERE IS THE POINTER I think.
+    * Allocate memory for an array of pointers to
+    * structures describing the buffers of one menu item
+    * written to a pointer on this structure.
+   */
   menus_bufors[pm->id_menu].item_bufor2 = malloc(pm->number_of_items *
                              sizeof(menu_item_bufor2_t*));
-  //obliczenie wsporzednej y menu
-  menu_coord_y = screen.ymid - (pm->number_of_items / 2) - 1;  //ilosc pozycji menu i jeszcze tytul menu
-  //dla kazdej pozycji w menu
+  //calculation of the y coordinate of the menu
+  menu_coord_y = screen.ymid - (pm->number_of_items / 2) - 1;  //number of menu items + menu title
+  //for each item on the menu
   for(i = 0; i < pm->number_of_items; i++){
-    //wyliczenie dlugosci bufora
+    //calculation of the buffer length
     bufor_len = strlen(MENU_ITEM_FRAME_L) +
                 strlen(MARGIN_L) +
                 strlen(pm->items[i].item_name) +
@@ -126,16 +132,16 @@ void create_menu(menu_t *pm){
                 strlen(MARGIN_R) +
                 strlen(MENU_ITEM_FRAME_R) +
                 + 1;
-    //utworzenie bufora dla jednej pozycji menu (bufor na tekst i na podspod)
-    //!!! TU SIE WYWALA  CZY ZAMIAST -> NIE POZIWNNO BYĆ . ???
+    //creating a buffer for one menu item (buffer for text and underneath)
+    //!!! IT FALLS HERE. Should there be (dot) instead of (arrow) ->. ???
     menus_bufors[pm->id_menu].item_bufor2[i] = malloc(sizeof(menu_item_bufor2_t));
     menus_bufors[pm->id_menu].item_bufor2[i]->text = malloc(bufor_len * sizeof(int));
     menus_bufors[pm->id_menu].item_bufor2[i]->covered = malloc(bufor_len * sizeof(int));
     menus_bufors[pm->id_menu].item_bufor2[i]->bufor_len = bufor_len;
-    //ustawienie wporzlednej x pozycji menu,  i wpolrzednej y
+    //set the x-coordinate of the menu item, and the y-coordinate
     menus_bufors[pm->id_menu].item_bufor2[i]->xy.x = screen.xmid - (bufor_len / 2);
     menus_bufors[pm->id_menu].item_bufor2[i]->xy.y = menu_coord_y++;
-    //wypelnienie trescia buforow
+    //filling buffers with content
     menu_item_text(
       menus_bufors[pm->id_menu].item_bufor2[i]->text,
       MENU_ITEM_FRAME_L,
@@ -147,7 +153,9 @@ void create_menu(menu_t *pm){
       MENU_ITEM_FRAME_R
     );
     menus_bufors[pm->id_menu].item_bufor2[i]->covered = malloc(bufor_len * sizeof(int));
-    /* na etapie tworzenie, nie ma sensu zapisywac tla, bo ono bedzie inne przy wywolaniu
+    /* at the creation stage, it makes no sense to write down the background, 
+     * because it will be different when called up
+     */
     read_screen(
       menus_bufors[pm->id_menu].item_bufor2[i]->covered,
       bufor_len,
@@ -163,9 +171,9 @@ void create_menu(menu_t *pm){
 
 /** destructor menu */
 void destroy_menu(menu_t *pm){
-  /* zwolnienie buforow */
+  /*release buffers */
   int i;
-  //usuniecie buforow na test i tlo pozycji w menu
+  //deletion of menu item buffers to text and background
   for(i = 0; i < pm->number_of_items; i++){
     free(menus_bufors[pm->id_menu].item_bufor2[i]->text);
     free(menus_bufors[pm->id_menu].item_bufor2[i]->covered);
@@ -175,7 +183,7 @@ void destroy_menu(menu_t *pm){
 }
 
 
-//pokazuje / ukrywa menu
+//shows / hides the menu
 void show_menu(menu_t *pm){
   int i;
   for(i = 0; i < pm->number_of_items; i++){
@@ -215,7 +223,7 @@ void hide_menu(menu_t *pm){
   }
   refresh();
 }
-//czeka na wybor
+//waiting for a choice
 int wait_for_user_choice(menu_t *pm){
   int user_choice;
   char user_key;
