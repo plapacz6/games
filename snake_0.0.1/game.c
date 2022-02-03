@@ -157,7 +157,7 @@ void PRINT_DEBUG(snake_t *psn, int key);
 //funkction definitions
 void init_ncurses(){
   initscr();
-  timeout(3); //-1 - blokowanie getchar(), >0 - bez blokowania
+  timeout(3); //-1 - bocking getchar(), >0 - without blocking
   raw();               //dispable buffering
   keypad(stdscr,TRUE); //enable FunctionKey, Arrows
   noecho();            //echo off
@@ -371,8 +371,8 @@ bool its_time_to_move(){
 }
 
 //game make one move of game
-/* eksperyment z wydajnoscia gdy niepotrzebnie zmienne 
-   sie przekazuje */
+/* experiment with efficiency when unnecessarily variables
+are passed to the function */
 //int game_move(snake_t *psn){
 void game_move(snake_t *psn,
     screen_t *psc, 
@@ -459,9 +459,9 @@ type_of_collision_t  collision_detect(
   }    
   
   //Checking for collision with obstackles:
-  //TODO: przeszkody alokowane dynamicznie na stercie
-  //i kazda ma wlasne wspolrzedne i dlugosc i ksztalt
-  //  return COLLISION_WITH_WALL;
+  //TODO: obstacles are dynamically allocated on the heap
+   // and each has its own coordinate and length and shape
+   // return COLLISION_WITH_WALL;
 
   //Checking for collisions with other snake:
   // return COLLISION_WITH_OTHER_SNAKE;
@@ -504,7 +504,7 @@ void snake_move_forward(snake_t *ps, coords_t *pc, bool growth){
 
 void draw_board(state_of_game_t *state_of_game){  
   int i;
-  //mvprintw(LINES - 1, COLS/2, "rysowanie planszy");
+  //mvprintw(LINES - 1, COLS/2, "drawing the board");
   
   mvaddch(screen.ymin, screen.xmin,
       graphic_symbol.board_border[IDX_BOARD_LU]);
@@ -527,7 +527,7 @@ void draw_board(state_of_game_t *state_of_game){
   mvaddch(screen.ymax, screen.xmax,
       graphic_symbol.board_border[IDX_BOARD_RD]);
  
-  //TODO: pionowe granice
+  //TODO: vertical boundaries
   for(i = screen.ymin + 1; i < screen.ymax - 1; i++){
     mvaddch(i, screen.xmin,
         graphic_symbol.board_border[IDX_BOARD_L]);
@@ -539,7 +539,7 @@ void draw_board(state_of_game_t *state_of_game){
 }
 
 void draw_snake(snake_t* ps, char snake_head_symbol){
-  //mvprintw(LINES - 1, 0, "rysowanie snakea");
+  //mvprintw(LINES - 1, 0, "sneak's drawing");
   /* snake_head_symbol is place of possible collision. */
   int i;
   mvaddch(ps->y[0], ps->x[0], snake_head_symbol);
@@ -553,7 +553,7 @@ void draw_snake(snake_t* ps, char snake_head_symbol){
 }
 
 void print_bottom_animation(char *frames){
-    //TODO: nie dziala to
+    //TODO: doestn't work
   static size_t animation_frame_counter = 0;
   char frame[5];
   frame[0] = frames[animation_frame_counter];

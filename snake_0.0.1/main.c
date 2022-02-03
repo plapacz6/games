@@ -90,7 +90,7 @@ menu_state_t show_help(int argc, char** argv){
 void init_game(void){
   puts("inicjlaizacja gry ... ");
   //ncurses init
-  //wyzerowanie stanu
+  //reset state
 }
 menu_state_t menu1(void){
   char user_answer = '0';
