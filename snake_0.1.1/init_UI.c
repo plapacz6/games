@@ -12,7 +12,8 @@ void init_UI(){
   keypad(stdscr,TRUE); //enable FunctionKey, Arrows
   noecho();            //echo off
   mvprintw(0, 2, "ncurses gotowe ... COLS == %d, LINES == %d", COLS, LINES);
-
+  refresh();
+  
   screen.xmin = 0;
   screen.ymin = 0;
   screen.xmax = (COLS - 1);

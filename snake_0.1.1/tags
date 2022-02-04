@@ -5,7 +5,8 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 APPLES_H	apples.h	2;"	d
-CFLAGS	Makefile	/^CFLAGS=-Wall -g3 -fsanitize=address$/;"	m
+CC	Makefile	/^CC=gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS= $/;"	m
 COLLISION_WITH_APPLE	game_logic.h	/^  COLLISION_WITH_APPLE,        \/\/snake growth +1$/;"	e	enum:type_of_collision_tt
 COLLISION_WITH_BORDER	game_logic.h	/^  COLLISION_WITH_BORDER = 1,$/;"	e	enum:type_of_collision_tt
 COLLISION_WITH_ONESELF	game_logic.h	/^  COLLISION_WITH_ONESELF,$/;"	e	enum:type_of_collision_tt
@@ -47,7 +48,6 @@ M3_END	game_menu_definition.h	/^  M3_END,$/;"	e	enum:user_choice_tt
 M3_END	test_menu_definition.h	/^  M3_END,$/;"	e	enum:user_choice_enum_t
 M3_RESTART	game_menu_definition.h	/^  M3_RESTART,$/;"	e	enum:user_choice_tt
 M3_RESTART	test_menu_definition.h	/^  M3_RESTART,$/;"	e	enum:user_choice_enum_t
-MALLOC_DEBUG	menu_UI.c	9;"	d	file:
 MAX_LEN_SNAKE	game_logic.h	7;"	d
 MAX_NUMBER_APPLES	game_logic.h	6;"	d
 MAX_NUMBER_OF_MENU	game_menu_definition.h	9;"	d
@@ -62,8 +62,8 @@ MODE_COLLISION_ONESLEF	snake_logic.h	/^  MODE_COLLISION_ONESLEF = 1,$/;"	e	enum:
 MODE_COLLISION_OTHER_SNAKE	snake_logic.h	/^  MODE_COLLISION_OTHER_SNAKE = 4,$/;"	e	enum:mode_of_snake_tt
 MODE_COLLISION_WALL	snake_logic.h	/^  MODE_COLLISION_WALL = 3,$/;"	e	enum:mode_of_snake_tt
 NO_COLLISION	game_logic.h	/^  NO_COLLISION = 0,$/;"	e	enum:type_of_collision_tt
-PMALLOC	menu_UI.c	/^  PMALLOC() {}$/;"	f
-PMALLOC	menu_UI.c	12;"	d	file:
+PMALLOC	menu_UI.c	/^PMALLOC() {}$/;"	f
+PMALLOC	menu_UI.c	13;"	d	file:
 PRINT_DEBUG	game_UI.c	/^void PRINT_DEBUG(snake_t *psn, int key){$/;"	f
 SNAKE_LOGIC_H	snake_logic.h	3;"	d
 TEST_MENU_DEFINITION_H	test_menu_definition.h	2;"	d

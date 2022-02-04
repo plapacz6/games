@@ -7,7 +7,7 @@ typedef struct {
 } menu_item_t;
 
 typedef struct {
-  size_t id_menu;
+  size_t id_menu;    //startng from 0  (first id_menu == 0) //otherwise problem in menu_UI.c in creating_menu
   size_t number_of_items;
   menu_item_t* items;
   char *menu_title;
@@ -19,7 +19,7 @@ menu_item_t m1[] = {
   {"x", "ZAKONCZ", M1_END},
 };
 menu_t menu1 = {
-  1, 3,
+  0, 3,
   m1,
   "SNAKE",
 };
@@ -28,7 +28,7 @@ menu_item_t m2[] = {
   {"x", "MENU GLOWNE", M2_RESTART},
 };
 menu_t menu2 = {
-  2, 2,
+  1, 2,
   m2,
   "PAUZA",
 };
@@ -37,7 +37,7 @@ menu_item_t m3[] = {
   {"x", "MENU GLOWNE", M3_END},
 };
 menu_t menu3 = {
-  3, 2,
+  2, 2,
   m3,
   "GAME OVER!",
 };

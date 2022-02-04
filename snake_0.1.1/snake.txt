@@ -1,3 +1,5 @@
+out of date draft
+
 The first draft of the breakdown of functionality. (Out of date)
 main_ncurses --> main_menu_ncurses, main_menu_logic
   main menu:

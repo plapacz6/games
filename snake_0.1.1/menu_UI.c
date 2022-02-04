@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
@@ -6,13 +7,13 @@
 #include "menu_definitions.h"
 #include "menu_UI.h"
 
-#define MALLOC_DEBUG
-  #ifdef MALLOC_DEBUG
-  #include <stdio.h>  
-  #define PMALLOC() {fprintf(stderr, "malloc in file %s line %d\n", __FILE__, __LINE__);}
-  #else
-  PMALLOC() {}
-  #endif
+//#define MALLOC_DEBUG
+#ifdef MALLOC_DEBUG
+#include <stdio.h>  
+#define PMALLOC() {fprintf(stderr, "malloc in file %s line %d\n", __FILE__, __LINE__);}
+#else
+PMALLOC() {}
+#endif
 /** description of the buffers of one menu item
  */
 typedef struct {
@@ -75,10 +76,11 @@ void menu_item_text(char *text,
 int read_screen(int *buf, size_t max_buf, int y1, int x1, int y2, int x2){
    int x, y, i;
    i = 0;
+   assert(max_buf >= x2 - x1);
    for(y = y1; y <= y2; y++){
      for(x = x1; x <= x2; x++){
        move(y,x);
-       buf[i] = inch();
+       buf[i] = inch();  
        i++;
        if(i > max_buf){
          return 2; //termination due to reaching the maximum buffer capacity
@@ -90,6 +92,7 @@ int read_screen(int *buf, size_t max_buf, int y1, int x1, int y2, int x2){
 int put_readed_screen(int *buf, size_t max_buf, int y1, int x1, int y2, int x2){
    int x, y, i;
    i = 0;
+   assert(max_buf >= x2 - x1);
    for(y = y1; y <= y2; y++){
      for(x = x1; x <= x2; x++){
        move(y,x);
@@ -115,8 +118,8 @@ void create_menu(menu_t *pm){
   char *MENU_ITEM_FRAME_R = "<<";
   //
   int menu_coord_y;
-  size_t i;
-  size_t bufor_len;
+  size_t i = 0;
+  size_t bufor_len = 0;
 
   /** Create a buffer set node for one menu.
     * HERE IS THE POINTER I think.
@@ -126,7 +129,7 @@ void create_menu(menu_t *pm){
    */
   
   PMALLOC();
-  menus_bufors[pm->id_menu].item_bufor2 = malloc(pm->number_of_items *
+  menus_bufors[pm->id_menu].item_bufor2 = calloc(pm->number_of_items,
                              sizeof(menu_item_bufor2_t*));
   //calculation of the y coordinate of the menu
   menu_coord_y = screen.ymid - (pm->number_of_items / 2) - 1;  //number of menu items + menu title
@@ -141,14 +144,13 @@ void create_menu(menu_t *pm){
                 strlen(MARGIN_R) +
                 strlen(MENU_ITEM_FRAME_R) +
                 + 1;
-    //creating a buffer for one menu item (buffer for text and underneath)
-    //!!! IT FALLS HERE. Should there be (dot) instead of (arrow) ->. ???
+    //creating a buffer for one menu item (buffer for text and underneath)    
     PMALLOC();
-    menus_bufors[pm->id_menu].item_bufor2[i] = malloc(sizeof(menu_item_bufor2_t));
+    menus_bufors[pm->id_menu].item_bufor2[i] = calloc(1, sizeof(menu_item_bufor2_t));
     PMALLOC();
-    menus_bufors[pm->id_menu].item_bufor2[i]->text = malloc(bufor_len * sizeof(int));
+    menus_bufors[pm->id_menu].item_bufor2[i]->text = calloc(bufor_len * 4, (sizeof(char))); //utf-8 ?
     PMALLOC();
-    menus_bufors[pm->id_menu].item_bufor2[i]->covered = malloc(bufor_len * sizeof(int));
+    menus_bufors[pm->id_menu].item_bufor2[i]->covered = calloc(bufor_len, sizeof(int));
     menus_bufors[pm->id_menu].item_bufor2[i]->bufor_len = bufor_len;
     //set the x-coordinate of the menu item, and the y-coordinate
     menus_bufors[pm->id_menu].item_bufor2[i]->xy.x = screen.xmid - (bufor_len / 2);
@@ -164,22 +166,6 @@ void create_menu(menu_t *pm){
       MARGIN_R,
       MENU_ITEM_FRAME_R
     );
-    PMALLOC();
-    menus_bufors[pm->id_menu].item_bufor2[i]->covered = malloc(bufor_len * sizeof(int));
-    /* at the creation stage, it makes no sense to write down the background, 
-     * because it will be different when called up
-     */
-    read_screen(
-      menus_bufors[pm->id_menu].item_bufor2[i]->covered,
-      bufor_len,
-      menus_bufors[pm->id_menu].item_bufor2[i]->xy.y,
-      menus_bufors[pm->id_menu].item_bufor2[i]->xy.x,
-      menus_bufors[pm->id_menu].item_bufor2[i]->xy.y,
-      menus_bufors[pm->id_menu].item_bufor2[i]->xy.x +
-      menus_bufors[pm->id_menu].item_bufor2[i]->bufor_len
-    );
-    /* 
-    */    
   }
 }
 
@@ -207,8 +193,8 @@ void show_menu(menu_t *pm){
       menus_bufors[pm->id_menu].item_bufor2[i]->xy.y,
       menus_bufors[pm->id_menu].item_bufor2[i]->xy.x,
       menus_bufors[pm->id_menu].item_bufor2[i]->xy.y,
-      menus_bufors[pm->id_menu].item_bufor2[i]->xy.x +
-      menus_bufors[pm->id_menu].item_bufor2[i]->bufor_len
+      menus_bufors[pm->id_menu].item_bufor2[i]->xy.x + (
+      menus_bufors[pm->id_menu].item_bufor2[i]->bufor_len - 1)
     );
     mvprintw(
       //i + 5,
@@ -231,8 +217,8 @@ void hide_menu(menu_t *pm){
       menus_bufors[pm->id_menu].item_bufor2[i]->xy.y,
       menus_bufors[pm->id_menu].item_bufor2[i]->xy.x,
       menus_bufors[pm->id_menu].item_bufor2[i]->xy.y,
-      menus_bufors[pm->id_menu].item_bufor2[i]->xy.x +
-      menus_bufors[pm->id_menu].item_bufor2[i]->bufor_len
+      menus_bufors[pm->id_menu].item_bufor2[i]->xy.x + (
+      menus_bufors[pm->id_menu].item_bufor2[i]->bufor_len - 1)
     );
   }
   refresh();

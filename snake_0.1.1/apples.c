@@ -15,7 +15,7 @@ void init_apples(){
   size_t i;
   size_t j;
   for(i = 0; i < apples.len; i++){
-    //-2   i +2  primitive way to move the jabled away from the edge (may not work for screen <2)
+    //-2   i +2 primitive way to move the jabled away from the edge (may not work for screen <2)
     apples.a[i].x = (rand()%( (screen.xmax - screen.xmin)  - 4) ) + 2;
     apples.a[i].y = (rand()%( (screen.ymax - screen.ymin)  - 4) ) + 2;
     for(j = 0; j < i; j++){
