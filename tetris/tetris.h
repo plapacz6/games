@@ -4,6 +4,10 @@
 #define TETRIS_H
 #include <stdlib.h>
 #include <stdbool.h>
+//#include <stdarg.h>
+#include <ncurses.h>
+
+
 
 typedef struct coord_tt {
   unsigned x;
@@ -17,6 +21,7 @@ typedef struct figure_tt {
   coord_t* b[4];  /**< pointers to bootom blocks (this changes on every turn) */
   unsigned xl;    /**< x of left edge of figure */
   unsigned xr;    /**<  x of right edge */
+  uint16_t background[4];
 
   int current_state; /**< how the figure is rotated at a given moment */
 
@@ -25,7 +30,7 @@ typedef struct figure_tt {
 } figure_t;
 
 typedef enum shape_code_tt {
-  SQUARE, 
+  SQUARE, //
   I_VERTICAL, I_HORIZONTAL, 
   L_UR, L_UL, L_DR, L_DL, 
   l_UR, l_UL, l_DR, l_DL 
@@ -34,6 +39,10 @@ typedef enum shape_code_tt {
 #define BOARD_WIDTH (10)
 typedef struct board_tt {
   unsigned ground_level[BOARD_WIDTH];  //array of coordynate y of ground level
+  unsigned top_y;
+  unsigned bottom_y;
+  unsigned left_x;
+  unsigned right_x;
 } board_t;
 
 bool is_bottom_contact(figure_t *f, board_t *b);
@@ -41,8 +50,8 @@ void step_down(figure_t *f);
 
 void flip_horizontally(figure_t *f);
 void flip_vertically(figure_t *f);
-void move_left(figure_t *f);
-void move_right(figure_t *f);
+void move_left(figure_t *f, board_t *b);
+void move_right(figure_t *f, board_t *b);
 void move_down(figure_t *f);
 
 figure_t *new_figure(/*color*/);  //alocate memory

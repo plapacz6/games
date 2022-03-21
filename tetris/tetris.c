@@ -1,83 +1,84 @@
 /* authour: plapacz6@gmail.com, date: 2022-02-24 */
-#include "tetris.h"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <stdbool.h>
+
 #include <ncurses.h>
+#include "tetris.h"
 
-
+board_t board;
+coord_t p0;
 
 /**
  * @brief 
  * first coordynats are always 0,0  and relatively to them are sepecified others coordynates
  * so, maybe first coordinates are unnececery.
  */
-#define FIGURE_NUMBER (15)
+#define FIGURE_NUMBER (20) //(19)
 coord_t shape[FIGURE_NUMBER][4] = {
 
   //first dreft
-  /* beginning block is first bottom left, others are relative to it */
-  {{0,0},{+1,0},{0,-1},{+1,-1}}, // []
-  
-  {{0,0},{0,-1},{0,-2},{0,-3}}, //  |
-  {{0,0},{-1,0},{-2,0},{-3,0}}, // ____   //rotation acdording to right block
-
-  {{0,0},{+1,0},{+2,0},{+2,-1}}, // ___I
-  {{0,0},{+1,0},{0,-1},{0,-2}}, //   |_
-  {{0,0},{0,-1},{+1,-1},{+2,-1}}, //  I---
-  {{0,0},{0,-1},{0,-2},{-1,-2}}, //   -|  
-  
-  {{0,0},{+1,0},{+2,0},{0,-1}}, //  I___
-  {{0,0},{0,-1},{0,-2},{+1,-2}}, //   |-
-  {{0,0},{-2,-1},{-1,-1},{0,-1}}, //  ---I
-  {{0,0},{+1,0},{+1,-1},{+1,-2}}, //  _|
-
   /*
   each figure is diffrent, 
   diffrent point of rotation
   diffrent transformation coordinates druing sequential rotation
 
-  square - not change at all 
-  rotate -
-  flit -
-
-  line:
-  rotate: alwas horizontal line chcange to vertical according to right vertice
-  flitp -
-
-  1.  L
-  2.  uppderdown L
-  3. ___I
-  4.  I___
-  5. reverse L
-  6. uppdrdan reverse L
-  7. ---|
-  8. |---
-  rotate: point of brak line: 
-  left: 1 -> 3, ...
-  right: 3 -> 1, ...
-  flip:  1 -> 5, 2 -> 6, ...
+  0. square - not change at all   
+  1. line:
+  2. line_vertical:
   */
-  {{0,0},{-1,0},{0,-1},{+1,-1}},
-  {{0,0},{+1,0},{-1,-1},{0,-1}},
-  {{0,0},{-1,-1},{0,-1},{-1,-2}},
-  {{0,0},{0,-1},{+1,-1},{+1,-2}},
+  /* beginning block is first bottom left, others are relative to it */
+  /* -1 */ {{0,0},{0,0},{0,0},{0,0}},  // for debug purpose only
+  /* 0 */ {{0,0},{+1,0},{0,-1},{+1,-1}}, // []
+  
+  /* 1 */ {{0,0},{0,-1},{0,-2},{0,-3}}, //  |
+  /* 2 */ {{0,0},{-1,0},{-2,0},{-3,0}}, // ____   //rotation acdording to right block
   /*
-  1. _|-  (reverse z)
-  2. -|_  z
-  3. turned z
-  4. turned reverse z
-  rotate: point of break line
-  left: 1->4, ...
-  right:
-  flip: reverse z-> z, z->reverse z, turned z -> turned reverse z, ...
+    3. ___I
+    4.  L
+    5. |---
+    6.  uppderdown L -|
+    
+    7.  I___    
+    8. uppdrdan reverse L |-
+    9. ---|
+    10. reverse L _|
   */
-
+  /* 3 */ {{0,0},{+1,0},{+2,0},{+2,-1}}, // ___I
+  /* 4 */ {{0,0},{+1,0},{0,-1},{0,-2}}, //   |_
+  /* 5 */ {{0,0},{0,-1},{+1,-1},{+2,-1}}, //  I---
+  /* 6 */ {{0,0},{0,-1},{0,-2},{-1,-2}}, //   -|  
+  
+  /*  7*/ {{0,0},{+1,0},{+2,0},{0,-1}}, //  I___
+  /*  8*/ {{0,0},{0,-1},{0,-2},{+1,-2}}, //   |-
+  /*  9*/ {{0,0},{-2,-1},{-1,-1},{0,-1}}, //  ---I
+  /* 10*/ {{0,0},{+1,0},{+1,-1},{+1,-2}}, //  _|
+  
   /*
-  _|`
-  -v-
+  11. //turned_left_z
+  13. -|_  z
+  14. _|-  (reverse z - rz)
+  12. //turned_left_rz 
   */
+  /* 11*/ {{0,0},{-1,0},{0,-1},{+1,-1}},  //turned_left_z
+  /* 12*/ {{0,0},{+1,0},{-1,-1},{0,-1}},
+  /* 13*/ {{0,0},{-1,-1},{0,-1},{-1,-2}}, //13. -|_  z
+  /* 14*/ {{0,0},{0,-1},{+1,-1},{+1,-2}}, //14. _|-  (reverse z)
+
+  /*  
+  15. _A_
+  16. vertical_left_A_
+  17. -v-
+  18. vertical_left_v_ 
+  */
+  /* 15*/ {{0,0},{0,+1},{-1,+1},{+1,+1}},  //hat _A_
+  /* 16*/ {{0,0},{-1,0},{-1,-1},{-2,0}},  //vertical_left_A_
+  /* 17*/ {{0,0},{-1,-1},{-1,0},{-1,+1}}, //reversed hat -v-
+  /* 18*/ {{0,0},{-1,0},{-1,+1},{-2,0}},  //vertical_left_v_
+
 };
 
 
@@ -103,6 +104,7 @@ bool is_bottom_contact(figure_t *f, board_t *b){
 void step_down(figure_t *f);
 
 typedef enum  {
+  FS_DEBUG,
   FS_BOX,
 
   FS_LINE_V,
@@ -122,9 +124,14 @@ typedef enum  {
   FS_Z_,
   FS_Z_LEFT,
   FS_RZ_LEFT,
+  
+  FS_HAT,
+  FS_HAT_VL,
+  FS_RHAT,
+  FS_RHAT_VL,
 } figure_shape_name_t;
 
-figure_t *create_figure(figure_shape_name_t fs){
+figure_t *create_figure(figure_shape_name_t fs, coord_t p0){
   size_t i = 0;
   size_t j = 0;
   figure_t *fg = calloc(1, sizeof(figure_t));
@@ -133,20 +140,18 @@ figure_t *create_figure(figure_shape_name_t fs){
     return NULL;
     //exit(-1);
   }
-  fg->xl = 0;
-  fg->xr = 0;
+  fg->xl = p0.x;
+  fg->xr = p0.x;
     
   for(i = 0; i < 4; i++){
-    fg->c[i].x = shape[fs][i].x;
-    fg->c[i].y = shape[fs][i].y;
+    fg->c[i].x = shape[fs][i].x + p0.x;
+    fg->c[i].y = shape[fs][i].y + p0.y;
     //figure out left and right edge of figure
     if(fg->xl > fg->c[i].x) fg->xl = fg->c[i].x;
     if(fg->xr < fg->c[i].x) fg->xr = fg->c[i].x;
+    fg->b[i] = &(fg->c[i]);
   }
-  //figure out bottom line
-  for(i = 0; i < 4; i++){
-    fg->b[i] = &fg->c[0];  
-  }
+  //figure out  //
   for(i = 0; i < 4; i++){
     for(j = i; j < 4; j++){
       if( fg->b[i]->x == fg->b[j]->x ){
@@ -157,6 +162,13 @@ figure_t *create_figure(figure_shape_name_t fs){
   return fg;
 }
 
+
+/* ____   //rotation acdording to right block
+  {{0,0},{+1,0},{+2,0},{+2,-1}}, // ___I
+  {{0,0},{+1,0},{0,-1},{0,-2}}, //   |_
+  {{0,0},{0,-1},{+1,-1},{+2,-1}}, //  I---
+  {{0,0},{0,-1},{0,-2},{-1,-2}}, //   -|  
+*/
 typedef struct rotate_table_tt {
   size_t n;
   figure_shape_name_t *form;
@@ -206,8 +218,11 @@ int craete_tables(){
     rt_box == NULL || rt_line == NULL || rt_L == NULL || rt_RL == NULL ||
     rt_Z == NULL || rt_RZ == NULL) 
     return -1;
-  printf("box: %d: %d\n", rt_box->n, rt_box->form[0]);
-  printf("rt_L: %d: %d, %d, %d, %d\n", rt_L->n, rt_L->form[0], rt_L->form[1], rt_L->form[2], rt_L->form[3]);
+  printf("box: %d: %d\n", (int)rt_box->n, (int)rt_box->form[0]);
+  printf("rt_L: %d: %d, %d, %d, %d\n", 
+    (int)rt_L->n, 
+    (int)rt_L->form[0], (int)rt_L->form[1], 
+    (int)rt_L->form[2], (int)rt_L->form[3]);
 
   return 0;
 }
@@ -218,8 +233,154 @@ void rotate_right(figure_t *f){
 
 }
 
+
+
+void move_right(figure_t *f, board_t *b){
+  size_t i = 0;
+  //size_t j = 0;
+  mvprintw(5,0, "%s", "moving RIGHT");
+  if(f->xr < (b->right_x - 4) ){
+    for(i = 0; i < 4; i++){    
+      f->c[i].x++;
+    }
+    f->xr++;
+    f->xl++;
+  }
+}
+void move_left(figure_t *f, board_t *b){
+  size_t i = 0;
+  //size_t j = 0;
+  mvprintw(5,0, "%s", "moving LEFT");
+  if(f->xl > (b->left_x + 4)) {
+    for(i = 0; i < 4; i++){    
+      f->c[i].x--;
+    }
+    f->xr--;
+    f->xl--;
+  }
+}
+void move_down(figure_t *f);
+
+void print_figure(figure_t *f, board_t* pb){
+  size_t i = 0;
+  mvprintw(3, 0, "%s", "print figure");
+  for(i = 0; i < 4; i++){
+    move(f->c[i].y, f->c[i].x);
+    f->background[i] = inch();
+    mvprintw(f->c[i].y + pb->top_y, f->c[i].x + pb->left_x, "%c", '@');    
+  }
+  refresh();
+}
+void unprint_figure(figure_t *f, board_t* pb){
+  size_t i = 0;
+  mvprintw(3, 0, "%s", "un_print figure");
+  for(i = 0; i < 4; i++){    
+    mvprintw(f->c[i].y + pb->top_y, f->c[i].x + pb->left_x, "%c", f->background[i]);
+  }
+  refresh();
+}
+
+figure_t *new_figure(/*color*/);  //alocate memory
+void generate_figure(figure_t *f, coord_t *sh);  //generate coordinates of blocks, and shape
+
+void test_shape_definition(){
+  for(int i = 0; i < FIGURE_NUMBER; i++){
+    for(int j = 0; j < 4; j++){
+      printf("[%2d, %2d]", shape[i][j].x, shape[i][j].y);
+    }
+    printf("%s", "\n");
+  }
+}
+void test_draw_shape(){
+  int shift_x = 2;
+  int shift_y = 10;
+
+  int16_t key;
+  //uint8_t keyH;
+  //uint8_t keyL;
+  bool finishDrawinFigures = false;
+
+  figure_t *f = NULL;
+  
+  if(craete_tables() == -1) exit(-1);
+  if(! (f = create_figure(FS_Z_, p0))) exit(-1);
+
+
+  setlocale(LC_ALL, "");
+  
+  initscr();
+  timeout(-1); //3); //-1);
+  raw();
+  keypad(stdscr, TRUE);
+  noecho();
+  
+  for(int i = 0; i < FIGURE_NUMBER; i++){
+    if(!(i % 4)) {
+      shift_y += 4;
+      shift_x = 2;
+    }
+    for(int j = 0; j < 4; j++){      
+      mvprintw(shift_y + shape[i][j].y, shift_x + shape[i][j].x, "%c", 'x'); //'\u2592'); //0x2588); // 219); // 178); //, "%d", i%10);      
+    }
+    shift_x += 6;
+    refresh();
+  }  
+  
+  while(!finishDrawinFigures){
+    mvprintw(0,0, "[ESC] or [q] => exit, [c] => clear");    
+    key = 0;
+    key = getch();
+    //keyH = key >> 8;
+    //keyL = (uint8_t) key;
+    mvprintw(1,0,"%c", key);
+    switch(key){
+      case 27: //ESC
+      case 'q':
+        finishDrawinFigures = true;
+        break;
+      case 'c':
+        clear();
+        print_figure(f, &board);
+        break;
+      case KEY_LEFT:
+      case 'l':
+        unprint_figure(f, &board);
+        move_left(f, &board);
+        print_figure(f, &board);
+        break;
+      case KEY_RIGHT:
+      case 'r':
+        unprint_figure(f, &board);
+        move_right(f, &board);
+        print_figure(f, &board);
+        break;
+      case KEY_UP:
+        break;
+      case KEY_DOWN:
+        break; 
+      //default:         
+       // break;      
+    }
+  }
+  mvprintw(0,0,"%d", key);
+  endwin();
+}
+int main(int argc, char **argv){
+  board.top_y = 10;
+  board.left_x = 10;
+  board.right_x = 60;
+  board.bottom_y = 25;
+  
+  p0.x = (board.left_x + board.right_x) / 2;
+  p0.y = board.top_y;
+  
+  test_shape_definition();
+  test_draw_shape();
+  return 0;
+}
+
 void flip_horizontally(figure_t *f) {
-  figure_shape_name_t fs;
+  figure_shape_name_t fs = FS_BOX;
 
   switch(fs) {
     case FS_BOX: {
@@ -276,127 +437,3 @@ void flip_horizontally(figure_t *f) {
   }//switch
 }
 void flip_vertically(figure_t *f);
-
-void move_right(figure_t *f){
-  size_t i = 0;
-  size_t j = 0;
-  mvprintw(0,4, "%s", "moving RIGHT");
-  if(f->xr < (COLS - 4) ){
-    for(i = 0; i < 4; i++){    
-      f->c[i].x++;
-    }
-    f->xr++;
-    f->xl++;
-  }
-}
-void move_left(figure_t *f){
-  size_t i = 0;
-  size_t j = 0;
-  mvprintw(0,4, "%s", "moving LEFT");
-  if(f->xl > 4) {
-    for(i = 0; i < 4; i++){    
-      f->c[i].x--;
-    }
-    f->xr--;
-    f->xl--;
-  }
-}
-void move_down(figure_t *f);
-
-void print_figure(figure_t *f){
-  size_t i = 0;
-  int shift_x = 10;
-  int shift_y = 10;
-  mvprintw(3, 0, "%s", "print figure");
-  for(i = 0; i < 4; i++){
-    mvprintw(f->c[i].y + shift_y, f->c[i].x + shift_x, "%c", '@');
-    refresh();
-  }
-}
-
-figure_t *new_figure(/*color*/);  //alocate memory
-void generate_figure(figure_t *f, coord_t *sh);  //generate coordinates of blocks, and shape
-
-void test_shape_definition(){
-  for(int i = 0; i < FIGURE_NUMBER; i++){
-    for(int j = 0; j < 4; j++){
-      printf("[%2d, %2d]", shape[i][j].x, shape[i][j].y);
-    }
-    printf("%s", "\n");
-  }
-}
-void test_draw_shape(){
-  int shift_x = 2;
-  int shift_y = 10;
-
-  int16_t key;
-  uint8_t keyH;
-  uint8_t keyL;
-
-  figure_t *f = NULL;
-  if(craete_tables() == -1) exit(-1);
-  if(! (f = create_figure(FS_Z_))) exit(-1);
-
-
-  setlocale(LC_ALL, "");
-  
-  initscr();
-  timeout(-1);
-  raw();
-  keypad(stdscr, true);
-  noecho();
-  
-  for(int i = 0; i < FIGURE_NUMBER; i++){
-    if(!(i % 4)) {
-      shift_y += 4;
-      shift_x = 2;
-    }
-    for(int j = 0; j < 4; j++){      
-      mvprintw(shift_y + shape[i][j].y, shift_x + shape[i][j].x, "%c", 'x'); //'\u2592'); //0x2588); // 219); // 178); //, "%d", i%10);      
-    }
-    shift_x += 6;
-    refresh();
-  }  
-  bool finishDrawinFigures = false;
-  while(!finishDrawinFigures){
-    mvprintw(0,0, "[ESC] or [q] => exit, [c] => clear");    
-    key = getch();
-    keyH = key >> 8;
-    keyL = (uint8_t) key;
-    mvprintw(1,0,"%c", key);
-    switch(key){
-      case 27: //ESC
-      case 'q':
-        finishDrawinFigures = true;
-        break;
-      case 'c':
-        clear();
-        print_figure(f);
-        break;
-      case KEY_LEFT:
-      case 'l':
-        move_left(f);
-        print_figure(f);
-        break;
-      case KEY_RIGHT:
-      case 'r':
-        move_right(f);
-        print_figure(f);
-        break;
-      case KEY_UP:
-        break;
-      case KEY_DOWN:
-        break; 
-      default: 
-        break;      
-    }
-  }
-  mvprintw(0,0,"%d", key);
-  endwin();
-}
-int main(int argc, char **argv){
-  test_shape_definition();
-  test_draw_shape();
-  return 0;
-}
-
