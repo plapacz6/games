@@ -14,6 +14,16 @@ typedef struct coord_tt {
   unsigned y;
 } coord_t;
 
+/**
+ * @brief type for store backgound during diplaying figure
+ * 
+ */
+typedef struct background_archive_tt {
+  unsigned x;
+  unsigned y; 
+  uint16_t b;
+} background_archive_t;
+
 typedef struct figure_tt {
   coord_t c[4];   /**< coodrynates of each block of element( of fugure). 
                        first element is hillighted as pivot point */
@@ -21,7 +31,8 @@ typedef struct figure_tt {
   coord_t* b[4];  /**< pointers to bootom blocks (this changes on every turn) */
   unsigned xl;    /**< x of left edge of figure */
   unsigned xr;    /**<  x of right edge */
-  uint16_t background[4];
+  bool bg_filled;  /**< backgound was stored */
+  background_archive_t bg[4];  /**< storage for backgorund place where figure is drawing */
 
   int current_state; /**< how the figure is rotated at a given moment */
 

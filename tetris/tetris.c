@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include <ncurses.h>
 #include "tetris.h"
@@ -131,37 +132,82 @@ typedef enum  {
   FS_RHAT_VL,
 } figure_shape_name_t;
 
-figure_t *create_figure(figure_shape_name_t fs, coord_t p0){
-  size_t i = 0;
-  size_t j = 0;
-  figure_t *fg = calloc(1, sizeof(figure_t));
-  if(fg == NULL){
-    perror("create figure: cant allocate memory");
-    return NULL;
-    //exit(-1);
-  }
-  fg->xl = p0.x;
-  fg->xr = p0.x;
-    
+/**
+ * @brief 
+ * 
+ * @param fg 
+ * @return int 1 == no error
+ */
+int define_shape_figure(figure_t *fg, figure_shape_name_t fs){
+  int i = 0;
   for(i = 0; i < 4; i++){
     fg->c[i].x = shape[fs][i].x + p0.x;
     fg->c[i].y = shape[fs][i].y + p0.y;
+  }
+  return 1;    
+}
+/**
+ * @brief 
+ * 
+ * @param fg 
+ * @return int 1 == no error
+ */
+int determine_LR_edge(figure_t *fg) {
     //figure out left and right edge of figure
+  int i = 0;
+  for(i = 0; i < 4; i++){
     if(fg->xl > fg->c[i].x) fg->xl = fg->c[i].x;
     if(fg->xr < fg->c[i].x) fg->xr = fg->c[i].x;
+    //fg->b[i] = &(fg->c[i]);    
+  }
+  return 1;
+}
+/**
+ * @brief 
+ * 
+ * @param fg 
+ * @return int 1 == no error
+ */
+int determine_bottom_line(figure_t *fg){
+  int i = 0;
+  int j = 0;
+  for(i = 0; i < 4; i++){
     fg->b[i] = &(fg->c[i]);
   }
-  //figure out  //
   for(i = 0; i < 4; i++){
     for(j = i; j < 4; j++){
       if( fg->b[i]->x == fg->b[j]->x ){
         if( fg->b[i]->y < fg->b[j]->y ){
           fg->b[i] = fg->b[j];
   }}}}  
+  return 1;    
+}
+/**
+ * @brief Create a figure object
+ * 
+ * @param fs 
+ * @param p0 
+ * @return figure_t* 
+ */
+figure_t *create_figure(figure_shape_name_t fs, coord_t p0){
+  //int i = 0;
+  //int j = 0;
+  figure_t *fg = calloc(1, sizeof(figure_t));
+  if(fg == NULL){
+    perror("create figure: cant allocate memory");
+    return NULL;
+    //exit(-1);
+  }  
+  fg->xl = p0.x;
+  fg->xr = p0.x;
+  fg->bg_filled = false;
+  //TODO: unroll in one loop
+  define_shape_figure(fg, fs);
+  determine_LR_edge(fg);
+  determine_bottom_line(fg);
   
   return fg;
 }
-
 
 /* ____   //rotation acdording to right block
   {{0,0},{+1,0},{+2,0},{+2,-1}}, // ___I
@@ -261,23 +307,48 @@ void move_left(figure_t *f, board_t *b){
 }
 void move_down(figure_t *f);
 
+/**
+ * @brief printf figure at the board
+ * Before printing make copy of background
+ * That copy of background is undependent on future 
+ * flip or turn figure, because it remember coordinates
+ * from it was take. 
+ * But this function must be followerd by unprint_figure soon.
+ * @param f 
+ * @param pb 
+ */
 void print_figure(figure_t *f, board_t* pb){
   size_t i = 0;
   mvprintw(3, 0, "%s", "print figure");
   for(i = 0; i < 4; i++){
     move(f->c[i].y, f->c[i].x);
-    f->background[i] = inch();
+    f->bg[i].x = f->c[i].x;
+    f->bg[i].y = f->c[i].y;
+    f->bg[i].b = inch();
     mvprintw(f->c[i].y + pb->top_y, f->c[i].x + pb->left_x, "%c", '@');    
   }
+  f->bg_filled = true;
   refresh();
 }
+/**
+ * @brief put back badground after print_figure rewrite it
+ * require previous call print_figure, to copy bacdround content to reconstruct
+ * @param f 
+ * @param pb 
+ */
 void unprint_figure(figure_t *f, board_t* pb){
   size_t i = 0;
-  mvprintw(3, 0, "%s", "un_print figure");
-  for(i = 0; i < 4; i++){    
-    mvprintw(f->c[i].y + pb->top_y, f->c[i].x + pb->left_x, "%c", f->background[i]);
+  if(f->bg_filled){
+    mvprintw(3, 0, "%s", "un_print figure");
+    for(i = 0; i < 4; i++){    
+      mvprintw(
+        f->bg[i].y + pb->top_y, 
+        f->bg[i].x + pb->left_x, 
+        "%c", f->bg[i].b);
+    }
+    f->bg_filled = false;
+    refresh();
   }
-  refresh();
 }
 
 figure_t *new_figure(/*color*/);  //alocate memory
@@ -342,6 +413,12 @@ void test_draw_shape(){
         clear();
         print_figure(f, &board);
         break;
+      case 'n':
+        unprint_figure(f, &board);
+        free(f);
+        f = NULL;
+        if(! (f = create_figure(rand()%19, p0))) exit(-1);
+        break;
       case KEY_LEFT:
       case 'l':
         unprint_figure(f, &board);
@@ -355,8 +432,14 @@ void test_draw_shape(){
         print_figure(f, &board);
         break;
       case KEY_UP:
+        unprint_figure(f, &board);
+        flip_horizontally(f);
+        print_figure(f, &board);
         break;
       case KEY_DOWN:
+        unprint_figure(f, &board);
+        flip_vertically(f);
+        print_figure(f, &board);
         break; 
       //default:         
        // break;      
@@ -373,6 +456,7 @@ int main(int argc, char **argv){
   
   p0.x = (board.left_x + board.right_x) / 2;
   p0.y = board.top_y;
+  srand(time(NULL));
   
   test_shape_definition();
   test_draw_shape();
@@ -380,60 +464,102 @@ int main(int argc, char **argv){
 }
 
 void flip_horizontally(figure_t *f) {
-  figure_shape_name_t fs = FS_BOX;
-
-  switch(fs) {
-    case FS_BOX: {
-      break;
-    }
-    case FS_LINE_V: {
-      break;
-    }
-    case FS_LINE_H: {
-      break;
-    }
-
-    case FS_L_LEFT: {
-      break;
-    }
-    case FS_L_: {
-      break;
-    }
-    case FS_L_RIGHT: {
-      break;
-    }
-    case FS_L_BOTTOMUP: {
-      break;
-    }
-
-    case FS_RL_LEFT: {
-      break;
-    }
-    case FS_RL_: {
-      break;
-    }
-    case FS_RL_RIGHT: {
-      break;
-    }
-    case FS_RL_BOTTOMUP: {
-      break;
-    }
-
-    case FS_RZ_: {
-      break;
-    }
-    case FS_Z_: {
-      break;
-    }
-    case FS_Z_LEFT: {
-      break;
-    }
-    case FS_RZ_LEFT: {
-      break;
-    }
-    default: {
-
-    }
-  }//switch
+  //TODO: wrong
+  int i = 0;
+  unsigned horiz_revrse_x[4];
+  for(i = 0; i < 4; i++){
+    mvprintw(6 + i, 2,"c.x[%d] c,y[%d]", f->c[i].x, f->c[i].y);        
+    horiz_revrse_x[3 - i] = f->c[i].x;
+  }
+  for(i = 0; i < 4; i++){
+    f->c[i].x = horiz_revrse_x[i];
+    mvprintw(6 + i, 15,"c.x[%d] c,y[%d]", f->c[i].x, f->c[i].y);        
+  }        
+  determine_LR_edge(f);
+  determine_bottom_line(f);
 }
-void flip_vertically(figure_t *f);
+void flip_vertically(figure_t *f){
+  //TODO: wrong
+  int i = 0;  
+  unsigned vertical_revrse_y[4];
+  for(i = 0; i < 4; i++){
+    mvprintw(6 + i, 2,"c.x[%d] c,y[%d]", f->c[i].x, f->c[i].y);        
+    vertical_revrse_y[3 - i] = f->c[i].y;
+  }
+  for(i = 0; i < 4; i++){
+    f->c[i].y = vertical_revrse_y[i];
+    mvprintw(6 + i, 15,"c.x[%d] c,y[%d]", f->c[i].x, f->c[i].y);        
+  }        
+  determine_LR_edge(f);
+  determine_bottom_line(f);
+}
+
+
+//determining x and y range
+  // unsigned x_min = f->c[0].x;
+  // unsigned x_max = x_min;
+  // unsigned y_min = f->c[0].y;
+  // unsigned y_max = y_min;
+  // for(i = 0; i < 4; i++){
+  //   if(x_min > f->c[i].x) x_min = f->c[i].x;
+  //   if(x_max < f->c[i].x) x_max = f->c[i].x;
+  //   if(y_min > f->c[i].y) y_min = f->c[i].y;
+  //   if(y_max < f->c[i].y) y_max = f->c[i].y;
+  // }  
+
+
+
+  // figure_shape_name_t fs = FS_BOX;
+  // switch(fs) {
+  //   case FS_BOX: {
+  //     break;
+  //   }
+  //   case FS_LINE_V: {
+  //     break;
+  //   }
+  //   case FS_LINE_H: {
+  //     break;
+  //   }
+
+  //   case FS_L_LEFT: {
+  //     break;
+  //   }
+  //   case FS_L_: {
+  //     break;
+  //   }
+  //   case FS_L_RIGHT: {
+  //     break;
+  //   }
+  //   case FS_L_BOTTOMUP: {
+  //     break;
+  //   }
+
+  //   case FS_RL_LEFT: {
+  //     break;
+  //   }
+  //   case FS_RL_: {
+  //     break;
+  //   }
+  //   case FS_RL_RIGHT: {
+  //     break;
+  //   }
+  //   case FS_RL_BOTTOMUP: {
+  //     break;
+  //   }
+
+  //   case FS_RZ_: {
+  //     break;
+  //   }
+  //   case FS_Z_: {
+  //     break;
+  //   }
+  //   case FS_Z_LEFT: {
+  //     break;
+  //   }
+  //   case FS_RZ_LEFT: {
+  //     break;
+  //   }
+  //   default: {
+
+  //   }
+  // }//switch
