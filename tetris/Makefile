@@ -1,5 +1,5 @@
 CC=gcc
-FLAGS= -g -Wall -std=c99 
+FLAGS= -g -Wall -std=c99
 LINKER_FLAGS= -g -Wall 
 LIBS=  $(ncursesw5-config --cflags --libs) -lncurses
 
