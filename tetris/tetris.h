@@ -1,4 +1,4 @@
-/* authour: plapacz6@gmail.com, date: 2022-02-24 */
+/* author: plapacz6@gmail.com, date: 2022-02-24 */
 
 #ifndef TETRIS_H
 #define TETRIS_H
@@ -73,11 +73,11 @@ typedef struct box_tt {
 typedef struct figure_tt {
   figure_shape_name_t fs;
   coord_t p0;   /**< pivot point */  
-  
+  unsigned bx;  /**< refrerence box view */
   box_t *box[4];   /**< coodrynates of each block of element( of fugure) */                       
   unsigned xl;    /**< x of left edge of figure */
   unsigned xr;    /**<  x of right edge */  
-  coord_t* bt[4];  /**< pointers to bootom blocks (this changes on every turn) */    
+  coord_t* bt[4];  /**< pointers to bootom blocks (this changes on every turn) */      
 } figure_t;
 
 typedef enum shape_code_tt {
@@ -88,35 +88,61 @@ typedef enum shape_code_tt {
 } shape_code_t;
 
 
+typedef struct gm_window_tt{  
+  WINDOW *w;
+  unsigned left_x;
+  unsigned top_y;  
+  unsigned width;
+  unsigned height;    
+} gm_window_t;
+
 /**************  board  ************************/
-#define BORAD_HIGHT (60)
-#define BOARD_WIDTH (10)
-typedef struct board_tt {
-  box_visual_t b[BORAD_HIGHT][BOARD_WIDTH];
-  unsigned ground_level[BOARD_WIDTH];  //array of coordynate y of ground level
-  unsigned top_y;
-  unsigned bottom_y;
+#define BORAD_HIGHT (24)
+#define BOARD_WIDTH (40)
+typedef struct board_tt {  
+  gm_window_t w;
   unsigned left_x;
   unsigned right_x;
+  box_visual_t b[BORAD_HIGHT][BOARD_WIDTH];
+  unsigned ground_level[BOARD_WIDTH];  //array of coordynate y of ground level
 } board_t;
 
+typedef struct next_fugure_window_tt {
+  gm_window_t w;
+}next_figure_window_t;
+
+typedef struct score_window_tt {
+  gm_window_t w;
+} score_window_t;
+
+typedef struct hint_window_tt {
+  gm_window_t w;
+} hint_window_t;
+
+typedef struct main_window_tt {
+  board_t b;
+  next_figure_window_t n;
+  score_window_t s;
+  hint_window_t h;
+} main_window_t;
 
 
 
 
-extern figure_t *create_figure(figure_shape_name_t fs, box_t *p_bx, coord_t *p_p1);
+extern figure_t *create_figure(figure_shape_name_t fs, unsigned bx, coord_t *p_p1);
 extern void diassemble_figure(figure_t *f, board_t *b);
 
-extern void turn_left(figure_t* f, coord_t *p1, board_t *p_b);
-extern void turn_right(figure_t* f, coord_t *p1, board_t *p_b);
+extern void turn_left(figure_t* f, board_t *p_b);
+extern void turn_right(figure_t* f, board_t *p_b);
 extern void flip_horizontally(figure_t *f);
 extern void flip_vertically(figure_t *f);
-extern void move_left(figure_t *f, board_t *b);
-extern void move_right(figure_t *f, board_t *b);
+extern void move_left(board_t *p_b, figure_t *f);
+extern void move_right(board_t *p_b, figure_t *f);
 
 extern bool is_bottom_contact(figure_t *f, board_t *b);
-extern void step_down(figure_t *f);
-extern void move_down(figure_t *f);
+extern void step_down(figure_t *f, board_t *p_b);
+extern void move_down(figure_t *f, board_t *p_b);
+
 
 
 #endif // TETRIS_H
