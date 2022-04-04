@@ -76,8 +76,7 @@ typedef struct figure_tt {
   unsigned bx;  /**< refrerence box view */
   box_t *box[4];   /**< coodrynates of each block of element( of fugure) */                       
   unsigned xl;    /**< x of left edge of figure */
-  unsigned xr;    /**<  x of right edge */  
-  coord_t* bt[4];  /**< pointers to bootom blocks (this changes on every turn) */      
+  unsigned xr;    /**<  x of right edge */    
 } figure_t;
 
 typedef enum shape_code_tt {

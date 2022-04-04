@@ -78,6 +78,15 @@ void unprint_figure(gm_window_t *p_w, figure_t *f){
   }
 }
 
+void print_ground(board_t *p_b){
+  int i = 0; 
+  int j = 0;
+  for(i = 1; i < BORAD_HIGHT - 1; i++)
+    for(j = 1; j < BOARD_WIDTH -1; j++){
+      mvwprintw(p_b->w.w, i, j, "%c", p_b->b[i][j].p);
+    }
+  wrefresh(p_b->w.w);
+}
 
 /**
  * @brief 
@@ -134,16 +143,20 @@ box_visual_t ref_box_v[REF_BOX_V_MAX] = {
 extern bool is_bottom_contact(figure_t *f, board_t *b){
   mvwprintw(win_score.w.w, 6,1,"%s","is_bottom_contact");
   wrefresh(win_score.w.w);
-  for(int i = 0; i < 4 && f->bt[i]; ++i){
-    for(int j = 0; j < BOARD_WIDTH; ++j){
-      if(((f->bt[i]->y) - 1) == b->ground_level[j]){
-        return true;
-      }
+  int i = 0;  
+  for(i = 0; i < 4; ++i) {
+    if(b->ground_level[f->box[i]->c.x] == f->box[i]->c.y){
+      return true;
     }
   }
   return false;
 }
+/*TODO
 
+  There is something wrong w deissabemle or is_bottom_contact
+  ones figure catched fragment of groudn and fallen down beneth
+  ground
+*/
 
 
 /**
@@ -185,27 +198,6 @@ int determine_LR_edge(figure_t *fg) {
 
 
 /**
- * @brief determine coordinates of bottof of figure
- * helping function
- * @param fg 
- * @return int 1 == no error
- */
-int determine_bottom_line(figure_t *fg){
-  int i = 0;
-  int j = 0;
-  for(i = 0; i < 4; i++){
-    fg->bt[i] = &(fg->box[i]->c);
-  }
-  for(i = 0; i < 4; i++){
-    for(j = i; j < 4; j++){
-      if( fg->bt[i]->x == fg->bt[j]->x ){
-        if( fg->bt[i]->y < fg->bt[j]->y ){
-          fg->bt[i] = fg->bt[j];
-  }}}}  
-  return 1;    
-} /***************  complete ********************/
-
-/**
  * @brief Create a figure object
  * 
  * @param fs - shape of figure
@@ -245,8 +237,7 @@ extern figure_t *create_figure(figure_shape_name_t fs, unsigned bx, coord_t *p_p
   
   //TODO: unroll in one loop
   define_shape_figure(fg, fs, bx);  
-  determine_LR_edge(fg);
-  determine_bottom_line(fg);
+  determine_LR_edge(fg);  
   
   return fg;
 } /***************  complete ********************/
@@ -262,7 +253,9 @@ extern void diassemble_figure(figure_t *f, board_t *b){
   wrefresh(win_score.w.w);
   int i = 0;  
   for(i = 0; i < 4; i++){
-    b->ground_level[ f->box[i]->c.x ] = f->box[i]->c.y;
+    if(b->ground_level[ f->box[i]->c.x ] > f->box[i]->c.y) {
+      b->ground_level[ f->box[i]->c.x ] = f->box[i]->c.y;
+    }
     b->b[f->box[i]->c.y][f->box[i]->c.x].p = f->box[i]->v.p;  
     b->b[f->box[i]->c.y][f->box[i]->c.x].c = f->box[i]->v.c;  
     
@@ -349,8 +342,7 @@ extern void turn_left(figure_t* f, board_t *p_b){
   }
   unprint_figure(&p_b->w,f);
   define_shape_figure(f, ns, f->bx);
-  determine_LR_edge(f);
-  determine_bottom_line(f);
+  determine_LR_edge(f);  
 }
 
 
@@ -427,8 +419,7 @@ extern void turn_right(figure_t* f, board_t *p_b){
   }
   unprint_figure(&p_b->w,f);
   define_shape_figure(f, ns, f->bx);
-  determine_LR_edge(f);  
-  determine_bottom_line(f);
+  determine_LR_edge(f);    
 }
 
 
@@ -470,21 +461,25 @@ extern void step_down(figure_t *f, board_t *p_b){
     mvwprintw(p_b->w.w, BORAD_HIGHT, 1, "the bottom has been reached");
     wrefresh(p_b->w.w);
   }
-  //determine_bottom_line(f);
+  
   if(is_bottom_contact(f,p_b)){
     diassemble_figure(f, p_b);
+    print_ground(p_b);
     //f = NULL;  //in diasseble, and local varialble
+    unprint_figure(&win_next.w, next_figure);
     current_figure = next_figure;  
     //f = current_figure;  //local variable
     
     next_figure = NULL;
     if(! (next_figure = create_figure(rand()%19 + 1, rand()%REF_BOX_V_MAX, &p1))) exit(-1);
+    print_figure(&win_next.w, next_figure);
     mvwprintw(win_next.w.w,1,1,"%s", "next figure:3");
     wrefresh(win_next.w.w);
   }  
 }
 
 extern void move_down(figure_t *f, board_t *p_b){
+  print_ground(p_b);
 }
 
 
@@ -690,9 +685,15 @@ int main(int argc, char **argv){
   nodelay(board.w.w, TRUE);
   board.left_x = board.w.left_x;
   board.right_x = board.w.left_x + board.w.width;        
-  for(i = 0; i < BOARD_WIDTH; i++){
+  for(i = 1; i < BOARD_WIDTH - 1; i++){
     board.ground_level[i] = BORAD_HIGHT - 2;
   }
+  int j = 0;
+  for(i = 1; i < BORAD_HIGHT - 1; i++)
+    for(j = 1; j < BOARD_WIDTH - 1; j++){
+      board.b[i][j].p = ' ';
+      board.b[i][j].c = 0;
+    }
   
   //global:coord_t p1;  //point of createing new figure
   p1.x = board.w.width / 2;
@@ -743,7 +744,6 @@ int main(int argc, char **argv){
 //     mvprintw(6 + i, 15,"c.x[%d] c,y[%d]", f->box[i]->c.x, f->box[i]->c.y);        
 //   }        
 //   determine_LR_edge(f);
-//   determine_bottom_line(f);
 // }
 
 // extern void flip_vertically(figure_t *f){
@@ -759,7 +759,6 @@ int main(int argc, char **argv){
 //     mvprintw(6 + i, 15,"c.x[%d] c,y[%d]", f->box[i]->c.x, f->box[i]->c.y);        
 //   }        
 //   determine_LR_edge(f);
-//   determine_bottom_line(f);
 // }
 
 // /* ____   //rotation acdording to right block
