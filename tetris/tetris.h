@@ -103,7 +103,7 @@ typedef struct board_tt {
   unsigned left_x;
   unsigned right_x;
   box_visual_t b[BORAD_HIGHT][BOARD_WIDTH];
-  unsigned ground_level[BOARD_WIDTH];  //array of coordynate y of ground level
+  unsigned ground_level[BOARD_WIDTH];  //array of y-coordynate of ground level
 } board_t;
 
 typedef struct next_fugure_window_tt {

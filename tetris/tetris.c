@@ -16,7 +16,9 @@ score_window_t win_score;
 hint_window_t win_hint;
 figure_t *current_figure = NULL;
 figure_t *next_figure = NULL;
+figure_t *symulate_figure = NULL;
 coord_t p1;  //point of createing new figure
+board_t *ptr_board;
 
 void print_info(unsigned y, unsigned x,char *fs, char *msg){
   mvwprintw(wnd_info,y,x,fs,msg);   
@@ -127,9 +129,11 @@ coord_t shape[FIGURE_NUMBER][4] = {
   /* 18*/ {{ 0, 0},{-1,-1},{ 0,-1},{ 0,-2}}  //vertical_left_v_
 
 };
+//#define REF_BOX_V_MAX (8)
 #define REF_BOX_V_MAX (5)
 box_visual_t ref_box_v[REF_BOX_V_MAX] = {
-  {'X',1},{'x',1},{'*',1},{'o',1},{'#',1}
+  {'X',1},{'x',1},{'*',1},{'o',1},{'#',1},
+  //{ACS_BLOCK,1},{ACS_BOARD,1},{ACS_BOARD,1}
 };
 
 /**
@@ -145,18 +149,35 @@ extern bool is_bottom_contact(figure_t *f, board_t *b){
   wrefresh(win_score.w.w);
   int i = 0;  
   for(i = 0; i < 4; ++i) {
-    if(b->ground_level[f->box[i]->c.x] == f->box[i]->c.y){
+    /* 
+      TURE if ground_level is of 1 below of current figure's y
+      so they are stick, but not cover
+      -1 insted of +1 because y grow to the bottom
+      greater y is lower on the screen
+    */
+    if( (b->ground_level[f->box[i]->c.x] - 1 ) == f->box[i]->c.y){
       return true;
     }
   }
   return false;
 }
-/*TODO
 
-  There is something wrong w deissabemle or is_bottom_contact
-  ones figure catched fragment of groudn and fallen down beneth
-  ground
-*/
+
+/**
+ * @brief figure out left and right edge of figure
+ * helping function
+ * @param fg 
+ * @return int 1 == no error
+ */
+int determine_LR_edge(figure_t *fg) {
+    //figure out left and right edge of figure
+  int i = 0;
+  for(i = 0; i < 4; i++){
+    if(fg->xl > fg->box[i]->c.x) fg->xl = fg->box[i]->c.x;
+    if(fg->xr < fg->box[i]->c.x) fg->xr = fg->box[i]->c.x;    
+  }
+  return 1;
+} /***************  complete ********************/
 
 
 /**
@@ -177,24 +198,10 @@ int define_shape_figure(figure_t *fg, figure_shape_name_t fs, unsigned bx) {
     fg->box[i]->v.p = ref_box_v[bx].p;
     fg->box[i]->v.c = ref_box_v[bx].c;
   }
+  determine_LR_edge(fg);
   return 1;    
 } /***************  complete ********************/
 
-/**
- * @brief figure out left and right edge of figure
- * helping function
- * @param fg 
- * @return int 1 == no error
- */
-int determine_LR_edge(figure_t *fg) {
-    //figure out left and right edge of figure
-  int i = 0;
-  for(i = 0; i < 4; i++){
-    if(fg->xl > fg->box[i]->c.x) fg->xl = fg->box[i]->c.x;
-    if(fg->xr < fg->box[i]->c.x) fg->xr = fg->box[i]->c.x;    
-  }
-  return 1;
-} /***************  complete ********************/
 
 
 /**
@@ -237,7 +244,7 @@ extern figure_t *create_figure(figure_shape_name_t fs, unsigned bx, coord_t *p_p
   
   //TODO: unroll in one loop
   define_shape_figure(fg, fs, bx);  
-  determine_LR_edge(fg);  
+  
   
   return fg;
 } /***************  complete ********************/
@@ -253,7 +260,13 @@ extern void diassemble_figure(figure_t *f, board_t *b){
   wrefresh(win_score.w.w);
   int i = 0;  
   for(i = 0; i < 4; i++){
+    /*
+    y coordinate grow to bottom, 
+    so if y1 > y2, then y1 is lower than y2
+    that's why cheking > instead of <
+    */
     if(b->ground_level[ f->box[i]->c.x ] > f->box[i]->c.y) {
+      /* ground_lever rise up*/
       b->ground_level[ f->box[i]->c.x ] = f->box[i]->c.y;
     }
     b->b[f->box[i]->c.y][f->box[i]->c.x].p = f->box[i]->v.p;  
@@ -268,6 +281,74 @@ extern void diassemble_figure(figure_t *f, board_t *b){
 } /***************  complete ********************/
 
 
+
+void copy_figure(figure_t *f1, figure_t *f2){
+  int i = 0;  
+  for(i = 0; i < 4; i++){
+    f2->box[i]->c.x  = f1->box[i]->c.x;
+    f2->box[i]->c.y  = f1->box[i]->c.y;
+    f2->box[i]->v.p  = f1->box[i]->v.p;
+    f2->box[i]->v.c  = f1->box[i]->v.c;
+  }
+  f2->fs = f1->fs;
+  f2->p0 = f1->p0;
+  f2->bx = f1->bx;
+  f2->xl = f1->xl;
+  f2->xr = f1->xr;
+}
+
+typedef enum figure_status_position_tt {
+  F_STATUS_POSITION_OK = 0b00000000,
+  F_STATUS_POSITION_LEFT_B = 0b00000001,
+  F_STATUS_POSITION_RIGHT_B = 0b00000010,
+  F_STATUS_POSITION_G = 0b00000100,  
+} figure_status_position_t;
+
+figure_status_position_t is_cover_LR(figure_t *f){
+  figure_status_position_t status = F_STATUS_POSITION_OK;
+  int i = 0;
+  for(i = 0; i < 4; i++){
+    /* cover border of board */
+    if(f->box[i]->c.x == ptr_board->left_x) 
+      status += F_STATUS_POSITION_LEFT_B;
+    if(f->box[i]->c.x == ptr_board->right_x) 
+      status += F_STATUS_POSITION_RIGHT_B;
+    /* cover ground element */
+    if(f->box[i]->c.x == ptr_board->ground_level[f->box[i]->c.x])
+      status += F_STATUS_POSITION_G;
+  }  
+  return status;  
+}
+
+void turn_figure(figure_t *f, board_t *p_b, figure_shape_name_t ns) {
+  unprint_figure(&p_b->w,f);
+  bool turn_ok = false;
+  bool turn_not_possible = false;
+  figure_status_position_t curr_status = F_STATUS_POSITION_OK;
+  copy_figure(f, symulate_figure);
+  do{    
+    define_shape_figure(symulate_figure, ns, symulate_figure->bx);
+    
+    curr_status = is_cover_LR(symulate_figure);
+    switch (curr_status) {      
+    case F_STATUS_POSITION_G:
+    case (F_STATUS_POSITION_LEFT_B | F_STATUS_POSITION_RIGHT_B) :    
+    case ( (F_STATUS_POSITION_LEFT_B | F_STATUS_POSITION_RIGHT_B) | F_STATUS_POSITION_G) :
+      turn_not_possible = true; 
+      break;
+    case F_STATUS_POSITION_OK:
+      turn_ok = true;
+      copy_figure(symulate_figure, f);      
+      break;
+    case F_STATUS_POSITION_LEFT_B:      
+      symulate_figure->p0.x++;
+      break;
+    case F_STATUS_POSITION_RIGHT_B:      
+      symulate_figure->p0.x--;
+      break;
+    }
+  } while(! (turn_ok || turn_not_possible));
+}
 
 extern void turn_left(figure_t* f, board_t *p_b){
   figure_shape_name_t  ns = FS_DEBUG;
@@ -340,10 +421,9 @@ extern void turn_left(figure_t* f, board_t *p_b){
     ns = FS_H3_RHAT;
     break;   //H4  
   }
-  unprint_figure(&p_b->w,f);
-  define_shape_figure(f, ns, f->bx);
-  determine_LR_edge(f);  
+ turn_figure(f, p_b, ns);  
 }
+
 
 
 extern void turn_right(figure_t* f, board_t *p_b){
@@ -416,18 +496,34 @@ extern void turn_right(figure_t* f, board_t *p_b){
   case FS_H4_RHAT_VL: 
     ns = FS_H1_HAT;
     break;   //H4  
+  
   }
-  unprint_figure(&p_b->w,f);
-  define_shape_figure(f, ns, f->bx);
-  determine_LR_edge(f);    
+  turn_figure(f, p_b, ns);  
 }
 
 
-extern void move_right(board_t *p_b, figure_t *f){
-  size_t i = 0;
-  //size_t j = 0;
+extern void move_right(board_t *p_b, figure_t *f){ /*REFACTOR*/
+  int i = 0;  
   print_info(5,1, "%s", "moving RIGHT");
-  if(f->xr < (p_b->right_x - 4) ){
+  if( f->xr < (p_b->right_x)){// - 1) ){      
+    for(i = 0; i < 4; i++){
+      /*
+      TODO:
+      case :
+                 **  ***
+                 *** *  <- place where it shoud be possible move left
+                 *****
+      it demand storing not only ground line but 
+      whole shape of ground (x and y)
+      */
+      /* 
+      y is near bottom when is greater 
+      xr+1 is not > board.right_x, because check in if^^^
+      */
+      if(ptr_board->ground_level[f->xr + 1] <= f->box[i]->c.y){
+        return;
+      }
+    }  
     for(i = 0; i < 4; i++){    
       f->box[i]->c.x++;
     }
@@ -437,11 +533,19 @@ extern void move_right(board_t *p_b, figure_t *f){
   }
 }
 
-extern void move_left(board_t *p_b, figure_t *f){
-  size_t i = 0;
-  //size_t j = 0;
+extern void move_left(board_t *p_b, figure_t *f){ /*REFACTOR*/
+  int i = 0;  
   print_info(5,1, "%s", "moving LEFT");
-  if(f->xl > (p_b->left_x + 4)) {
+  if(f->xl > (p_b->left_x)){// + 1)) {
+    for(i = 0; i < 4; i++){
+      /* 
+      y is near bottom when is greater 
+      xr-1 is not < board.left_x, because check in if^^^
+      */
+      if(ptr_board->ground_level[f->xl - 1] <= f->box[i]->c.y){
+        return;
+      }
+    }      
     for(i = 0; i < 4; i++){    
       f->box[i]->c.x--;
     }
@@ -479,6 +583,13 @@ extern void step_down(figure_t *f, board_t *p_b){
 }
 
 extern void move_down(figure_t *f, board_t *p_b){
+  int i = 0;
+  /*
+  for(i = 0; i < 4; i++){
+    p_b->ground_level[f->box[i]->c.x]
+    f->box[i]->c.y = ...
+  }
+  */
   print_ground(p_b);
 }
 
@@ -529,7 +640,7 @@ void main_loop(board_t *p_board, coord_t *p_p1){
   bool finishDrawinFigures = false;
 
   clock_t time_start;
-  unsigned interval = 100; //ms
+  unsigned interval = 500; //ms
 
   figure_t *f = NULL;  
   figure_shape_name_t fs = 0;
@@ -537,6 +648,8 @@ void main_loop(board_t *p_board, coord_t *p_p1){
   fs = rand()%19 + 1;
   current_figure = NULL;
   if(! (current_figure = create_figure(fs, rand()%REF_BOX_V_MAX, p_p1))) exit(-1);
+  symulate_figure = NULL;
+  if(! (symulate_figure = create_figure(0, 0, p_p1))) exit(-1);
 
   fs = rand()%19 + 1;
   next_figure = NULL;
@@ -550,7 +663,7 @@ void main_loop(board_t *p_board, coord_t *p_p1){
   mvwprintw(win_hint.w.w, 1, 1,"%s","[ESC] or [q] => exit,  [c] => clear");
   mvwprintw(win_hint.w.w, 2, 1,"%s","[<-] move left,     [->] move right");
   mvwprintw(win_hint.w.w, 3, 1,"%s","[space]  drop down,  [n] new figure");
-  //wrefresh(win_hint.w.w);
+  wrefresh(win_hint.w.w);
   time_start = clock();
   while(!finishDrawinFigures){
     
@@ -562,10 +675,18 @@ void main_loop(board_t *p_board, coord_t *p_p1){
       wrefresh(p_board->w.w);
       refresh();
       time_start = clock();
+      /*
+      after step don't process key input
+      becasue 1 action at time
+      (step + move left/right may cause not detect contact with ground)
+      */
+      //continue;  
     }
     
-    mvwprintw(win_hint.w.w, 4, 1,"%s","catching cursor here");
-    wrefresh(win_hint.w.w);
+    //mvwprintw(win_hint.w.w, 4, 1,"%s","catching cursor here");
+    //wrefresh(win_hint.w.w);
+    curs_set(0);  //invisible cursor
+  
     key = 0;
     key = getch();
     //keyH = key >> 8;
@@ -637,8 +758,9 @@ void main_loop(board_t *p_board, coord_t *p_p1){
         print_figure(&p_board->w, f);
         break; 
       case ' ':
+        unprint_figure(&p_board->w, f);
         move_down(f, p_board);
-        
+        print_figure(&p_board->w, f);
         break;
       //default:         
        // break;      
@@ -681,12 +803,13 @@ int main(int argc, char **argv){
   
   /********  creating windows  **************/
   board_t board;
+  ptr_board = &board;
   create_window_frame(&board.w, BORAD_HIGHT, BOARD_WIDTH, 0, 0);
   nodelay(board.w.w, TRUE);
   board.left_x = board.w.left_x;
-  board.right_x = board.w.left_x + board.w.width;        
+  board.right_x = board.w.left_x + board.w.width - 2; //-1 -> cover right border       
   for(i = 1; i < BOARD_WIDTH - 1; i++){
-    board.ground_level[i] = BORAD_HIGHT - 2;
+    board.ground_level[i] = BORAD_HIGHT - 1; /* -0 belowe visible area */
   }
   int j = 0;
   for(i = 1; i < BORAD_HIGHT - 1; i++)
