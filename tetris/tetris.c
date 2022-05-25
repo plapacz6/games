@@ -7,24 +7,38 @@
 #include <stdbool.h>
 #include <time.h>
 
+#include <pthread.h>
+
 #include <ncurses.h>
+#include "control_version.h"
 #include "tetris.h"
 
-WINDOW *wnd_info = NULL;
+WINDOW *wnd_info = NULL; /*DEBUG*/
 next_figure_window_t win_next;
 score_window_t win_score;  
 hint_window_t win_hint;
-figure_t *current_figure = NULL;
-figure_t *next_figure = NULL;
-figure_t *symulate_figure = NULL;
-coord_t p1;  //point of createing new figure
-board_t *ptr_board;
 
+board_t board;
+figure_t current_figure;
+figure_t next_figure;
+figure_t symulate_figure;
+coord_t p1;  //point of creating new figure
+coord_t p2;  //point of creating next figure
+
+char *error_msg = {
+    "create figure: cant allocate memory for ...",    
+};
+
+game_state_t game_state;
+
+game_cfg_t game_cfg;
+
+
+/*DEBUG*/
 void print_info(unsigned y, unsigned x,char *fs, char *msg){
   mvwprintw(wnd_info,y,x,fs,msg);   
   wrefresh(wnd_info);
 }
-
 
 
 /**
@@ -40,62 +54,72 @@ void print_info(unsigned y, unsigned x,char *fs, char *msg){
 void print_figure(gm_window_t *p_w, figure_t *f){
   size_t i = 0;  
   for(i = 0; i < 4; i++){
-    if(f->box[i]->bg_filled){
-      perror("background not returned");            
-    }
-    assert(!f->box[i]->bg_filled);
-    print_info(3, 1, "%s", "print box_t");
-    wmove(p_w->w, f->box[i]->c.y, f->box[i]->c.x);
-    f->box[i]->bg = inch();
+    assert(f->box[i].bg_filled == false);
+    print_info(3, 1, "%s", "print box_t"); /*DEBUG*/
+    
+    wmove(p_w->w, f->box[i].c.y, f->box[i].c.x);
+    f->box[i].bg = inch();  //archiving background
     mvwprintw(p_w->w, 
-      f->box[i]->c.y, 
-      f->box[i]->c.x, 
-      "%c", f->box[i]->v.p);    
-    f->box[i]->bg_filled = true;
+      f->box[i].c.y, 
+      f->box[i].c.x, 
+      "%c", f->box[i].v.p);    
+    f->box[i].bg_filled = true;
   }  
   wrefresh(p_w->w);
 }
 
+
 /**
  * @brief put back badground after print_figure rewrite it
- * require previous call print_figure, to copy bacdround content to reconstruct
+ * Not require previous call print_figure, to copy bacdround content to reconstruct
+ * In such case, nothing is done.
  * @param f 
  * @param pb 
  */
 void unprint_figure(gm_window_t *p_w, figure_t *f){
   size_t i = 0;
   for(i = 0; i < 4; i++){    
-    if(f->box[i]->bg_filled){
+    if(f->box[i].bg_filled){
       print_info(3, 1, "%s", "un_print box");
     
+      //restoring backgound
       mvwprintw(
         p_w->w,
-        f->box[i]->c.y, 
-        f->box[i]->c.x, 
-        "%c", f->box[i]->bg);
-      f->box[i]->bg = 0;
-      f->box[i]->bg_filled = false;        
+        f->box[i].c.y, 
+        f->box[i].c.x, 
+        "%c", f->box[i].bg);
+      f->box[i].bg = 0;
+      f->box[i].bg_filled = false;        
     }    
     wrefresh(p_w->w);
   }
 }
 
-void print_ground(board_t *p_b){
+/**
+ * @brief redrawing entire boread (use only before first call print_figure
+ * 
+ * print_figure() fill a bufor for storing piece of backdound, and its value will be unactual
+ * after call print_board()
+ * 
+ * @param p_b 
+ */
+void print_board(){
   int i = 0; 
   int j = 0;
   for(i = 1; i < BORAD_HIGHT - 1; i++)
     for(j = 1; j < BOARD_WIDTH -1; j++){
-      mvwprintw(p_b->w.w, i, j, "%c", p_b->b[i][j].p);
+      mvwprintw(board.w.w, i, j, "%c", board.b[i][j].p);
     }
-  wrefresh(p_b->w.w);
+  wrefresh(board.w.w);
 }
+
 
 /**
  * @brief 
  * first coordynats are always 0,0  and relatively to them are sepecified others coordynates
  * so, maybe first coordinates are unnececery.
  */
-#define FIGURE_NUMBER (20) //(19)
+
 coord_t shape[FIGURE_NUMBER][4] = {
    
   /* -1 */{{ 0, 0},{ 0, 0},{ 0, 0},{ 0, 0}},  // for debug purpose only
@@ -129,34 +153,88 @@ coord_t shape[FIGURE_NUMBER][4] = {
   /* 18*/ {{ 0, 0},{-1,-1},{ 0,-1},{ 0,-2}}  //vertical_left_v_
 
 };
-//#define REF_BOX_V_MAX (8)
-#define REF_BOX_V_MAX (5)
-box_visual_t ref_box_v[REF_BOX_V_MAX] = {
+
+box_appearc_t ref_box_v[REF_BOX_A_MAX] = {
   {'X',1},{'x',1},{'*',1},{'o',1},{'#',1},
   //{ACS_BLOCK,1},{ACS_BOARD,1},{ACS_BOARD,1}
 };
+box_appearc_t ref_board_empty_field = {
+  ' ', 0
+};
+
+bool is_board_field_empty(coord_t *p_c) {
+  if( board.b[p_c->y][p_c->x].p == ref_board_empty_field.p ){
+    return true;
+  }
+  return false;
+}
 
 /**
- * @brief checking if figure is in direct neibourshood with actual ground level 
+ * @brief find coord's y-part  1 before current ground level
+ * 
+ * @param p_c 
+ */
+unsigned find_ground_y_coord(coord_t *p_c){
+  int i = 0;
+  for(i = p_c->y; i < BORAD_HIGHT; i++){
+    if( board.b[i][p_c->x].p != ref_board_empty_field.p){
+      break;
+    }
+  }  
+  return i - 1;
+}
+
+/**
+ * @brief find coords of figure that are higher (less y part) in all figure's box'es highst
+ * for move_down()
+ * @param p_f 
+ */
+void find_ground_figure_coord(figure_t *p_f){
+  int i = 0;
+  unsigned min_y = 0;
+  unsigned prev_min_y = 0;
+  for(i = 0; i < 4; i++){
+    min_y = find_ground_y_coord(& p_f->box[i].c);
+    if(min_y < prev_min_y)
+      prev_min_y = min_y;
+  }
+  /* TODO ..........................  */
+  return;
+}
+
+
+
+/**
+ * @brief checking if figure is in direct neibourhood with actual ground level 
  * 
  * @param f - figure
  * @param b - board
  * @return true 
  * @return false 
  */
-extern bool is_bottom_contact(figure_t *f, board_t *b){
+bool is_bottom_contact(figure_t *f, board_t *b){
   mvwprintw(win_score.w.w, 6,1,"%s","is_bottom_contact");
   wrefresh(win_score.w.w);
   int i = 0;  
   for(i = 0; i < 4; ++i) {
     /* 
-      TURE if ground_level is of 1 below of current figure's y
+      TRUE if ground_level is of 1 below of current figure's y
       so they are stick, but not cover
       -1 insted of +1 because y grow to the bottom
       greater y is lower on the screen
-    */
-    if( (b->ground_level[f->box[i]->c.x] - 1 ) == f->box[i]->c.y){
+    */   
+    if( (b->b[f->box[i].c.y + 1][f->box[i].c.x]).p 
+          != ref_board_empty_field.p 
+        ||
+          //f->box[i].c.y == (BORAD_HIGHT - 2)   //c.y == 0 -> y:1
+          /* DEBUG vvv */
+          f->box[i].c.y >= (BORAD_HIGHT - 2)
+        ){
       return true;
+      /*
+      board field's content differ from screen content, so border line
+      of board '-' isn't substitute of not empty filed
+      */
     }
   }
   return false;
@@ -173,8 +251,8 @@ int determine_LR_edge(figure_t *fg) {
     //figure out left and right edge of figure
   int i = 0;
   for(i = 0; i < 4; i++){
-    if(fg->xl > fg->box[i]->c.x) fg->xl = fg->box[i]->c.x;
-    if(fg->xr < fg->box[i]->c.x) fg->xr = fg->box[i]->c.x;    
+    if(fg->xl > fg->box[i].c.x) fg->xl = fg->box[i].c.x;
+    if(fg->xr < fg->box[i].c.x) fg->xr = fg->box[i].c.x;    
   }
   return 1;
 } /***************  complete ********************/
@@ -183,20 +261,22 @@ int determine_LR_edge(figure_t *fg) {
 /**
  * @brief set shape of figure
  * 
- * @param fg 
+ * @param fg - pointer to figure_t
+ * @param fs - index in figure shape array
+ * @param bx - index in figure style array
  * @return int 1 == no error
  */
 int define_shape_figure(figure_t *fg, figure_shape_name_t fs, unsigned bx) {
   int i = 0;
   fg->fs = fs;
   for(i = 0; i < 4; i++){
-    fg->box[i]->c.x = shape[fs][i].x + fg->p0.x;
-    fg->box[i]->c.y = shape[fs][i].y + fg->p0.y;
-    assert(!fg->box[i]->bg_filled);
-    fg->box[i]->bg = 0;
-    fg->box[i]->bg_filled = false;
-    fg->box[i]->v.p = ref_box_v[bx].p;
-    fg->box[i]->v.c = ref_box_v[bx].c;
+    fg->box[i].c.x = shape[fs][i].x + fg->p0.x;
+    fg->box[i].c.y = shape[fs][i].y + fg->p0.y;
+    assert(!fg->box[i].bg_filled);
+    fg->box[i].bg = 0;
+    fg->box[i].bg_filled = false;
+    fg->box[i].v.p = ref_box_v[bx].p;
+    fg->box[i].v.c = ref_box_v[bx].c;
   }
   determine_LR_edge(fg);
   return 1;    
@@ -205,97 +285,96 @@ int define_shape_figure(figure_t *fg, figure_shape_name_t fs, unsigned bx) {
 
 
 /**
- * @brief Create a figure object
- * 
- * @param fs - shape of figure
- * @param p_box - pointer to reference box
- * @param p1 - beggining point on board 
- * @return figure_t* 
+ * @brief Create a figure object (alocate memory)
+ * To use at preparation environment of game, memory remain the same, but content of figures is changing 
+ * @param fg - pointer to figure_t
+ * @param fs - shape of figure (index in figure shape table)
+ * @param bx - index in figure style array
+ * @param p_p1 - pointer to beggining point on board
+ * @return 1 - ok
  */
-extern figure_t *create_figure(figure_shape_name_t fs, unsigned bx, coord_t *p_p1){
-  assert(bx < REF_BOX_V_MAX);
-  int i = 0;
-  figure_t *fg = calloc(1, sizeof(figure_t));
-  if(fg == NULL){
-    perror("create figure: cant allocate memory");
-    return NULL;    
-  }  
-  for(i = 0; i < 4; i++){
-    fg->box[i] = NULL;
-    fg->box[i] = calloc(1, sizeof(box_t));
-    if(fg->box[i] == NULL) break;
-  }
-  if(i < 4){    
-    perror("create figure: cant allocate memory");
-    for( ; i >= 0; i--){
-      free(fg->box[i]);
-      fg->box[i] = NULL; //double free()
-    }
-    free(fg);
-    fg = NULL;    
-    return NULL;    
-  }
+int create_figure(figure_t *fg, figure_shape_name_t fs, unsigned bx, coord_t *p_p1){
+  assert(bx < REF_BOX_A_MAX); 
+  
   fg->p0.x = p_p1->x;
   fg->p0.y = p_p1->y;
   
   fg->xl = p_p1->x;
   fg->xr = p_p1->x;
   fg->bx = bx;
-  
-  //TODO: unroll in one loop
+    
   define_shape_figure(fg, fs, bx);  
-  
-  
-  return fg;
-} /***************  complete ********************/
+    
+  return 1;
+}
+
+
 
 /**
- * @brief dissasemble figure on boxes, and make them part of the ground
- * after moving boxes to the ground, free figure_t memory
- * @param f - figure
+ * @brief dissasemble figure and make it part of gound
+ * 
+ * color and pattern of boxes, are copied to the fileds of borad. 
+ * 
+ * Before call use unprint_figure(&win_next, &next_figure).* 
+ * @param f - figure, (remain untached, so figure cover part of ground after this function call)
  * @param b - board
  */
-extern void diassemble_figure(figure_t *f, board_t *b){
+void diassemble_figure(figure_t *f, board_t *b){
+  assert(f->box[0].bg_filled == false);
+
   mvwprintw(win_score.w.w, 6,1,"%s","disassemble figure");
   wrefresh(win_score.w.w);
+
   int i = 0;  
   for(i = 0; i < 4; i++){
-    /*
-    y coordinate grow to bottom, 
-    so if y1 > y2, then y1 is lower than y2
-    that's why cheking > instead of <
-    */
-    if(b->ground_level[ f->box[i]->c.x ] > f->box[i]->c.y) {
-      /* ground_lever rise up*/
-      b->ground_level[ f->box[i]->c.x ] = f->box[i]->c.y;
-    }
-    b->b[f->box[i]->c.y][f->box[i]->c.x].p = f->box[i]->v.p;  
-    b->b[f->box[i]->c.y][f->box[i]->c.x].c = f->box[i]->v.c;  
-    
-    free(f->box[i]);
-    f->box[i] = NULL; //double free()
-  }
-
-  free(f);
-  f = NULL;
-} /***************  complete ********************/
+    b->b[f->box[i].c.y][f->box[i].c.x].p = f->box[i].v.p;  
+    b->b[f->box[i].c.y][f->box[i].c.x].c = f->box[i].v.c;            
+  }  
+}
 
 
 
-void copy_figure(figure_t *f1, figure_t *f2){
+/**
+ * @brief generate next figure
+ * Before call use unprint_figure(&win_next, &next_figure).
+ * @param f 
+ * @param p_p1 - coordinates of generated figure
+ */
+void generate_next_figure(figure_t *f, coord_t *p_p1){
+  assert(f->box[0].bg_filled == false);
+
+  figure_shape_name_t fs = (rand()%(FIGURE_NUMBER - 1)) + 1;  
+  
+  create_figure(&next_figure, fs, rand()%REF_BOX_A_MAX, p_p1);    
+}
+
+
+
+/**
+ * @brief copy content of f1 to f2
+ * Both figures must be unprintf before copying.
+ * @param f2 destination
+ * @param f1 source
+ * @param p_p1 pointer to coord_t where f2 will be placed
+ */
+void copy_figure(figure_t *f2, figure_t *f1, coord_t *p_p1){
   int i = 0;  
   for(i = 0; i < 4; i++){
-    f2->box[i]->c.x  = f1->box[i]->c.x;
-    f2->box[i]->c.y  = f1->box[i]->c.y;
-    f2->box[i]->v.p  = f1->box[i]->v.p;
-    f2->box[i]->v.c  = f1->box[i]->v.c;
+    f2->box[i].c.x  = f1->box[i].c.x;
+    f2->box[i].c.y  = f1->box[i].c.y;
+    f2->box[i].v.p  = f1->box[i].v.p;
+    f2->box[i].v.c  = f1->box[i].v.c;
+    f2->box[i].bg_filled = false;
   }
   f2->fs = f1->fs;
-  f2->p0 = f1->p0;
+  f2->p0.x = p_p1->x;// f1->p0;
+  f2->p0.y = p_p1->y;
   f2->bx = f1->bx;
   f2->xl = f1->xl;
   f2->xr = f1->xr;
 }
+
+
 
 typedef enum figure_status_position_tt {
   F_STATUS_POSITION_OK = 0b00000000,
@@ -309,27 +388,42 @@ figure_status_position_t is_cover_LR(figure_t *f){
   int i = 0;
   for(i = 0; i < 4; i++){
     /* cover border of board */
-    if(f->box[i]->c.x == ptr_board->left_x) 
+    if(f->box[i].c.x == board.left_x) 
       status += F_STATUS_POSITION_LEFT_B;
-    if(f->box[i]->c.x == ptr_board->right_x) 
+    if(f->box[i].c.x == board.right_x) 
       status += F_STATUS_POSITION_RIGHT_B;
     /* cover ground element */
-    if(f->box[i]->c.x == ptr_board->ground_level[f->box[i]->c.x])
+    if( board.b[f->box[i].c.y][f->box[i].c.x].p 
+          != ref_board_empty_field.p 
+        ||
+          f->box[i].c.y >= (BORAD_HIGHT - 1)
+        ){
       status += F_STATUS_POSITION_G;
+    }
   }  
   return status;  
 }
 
+
+
+/**
+ * @brief cheking if turn on current position is possible
+ * If not, trying to correct slitly current position and turn again
+ * @param f 
+ * @param p_b 
+ * @param ns 
+ */
 void turn_figure(figure_t *f, board_t *p_b, figure_shape_name_t ns) {
-  unprint_figure(&p_b->w,f);
+  unprint_figure(&p_b->w, f);
   bool turn_ok = false;
   bool turn_not_possible = false;
   figure_status_position_t curr_status = F_STATUS_POSITION_OK;
-  copy_figure(f, symulate_figure);
+
+  copy_figure(&symulate_figure, f, &(f->p0));
   do{    
-    define_shape_figure(symulate_figure, ns, symulate_figure->bx);
+    define_shape_figure(&symulate_figure, ns, symulate_figure.bx);
     
-    curr_status = is_cover_LR(symulate_figure);
+    curr_status = is_cover_LR(&symulate_figure);
     switch (curr_status) {      
     case F_STATUS_POSITION_G:
     case (F_STATUS_POSITION_LEFT_B | F_STATUS_POSITION_RIGHT_B) :    
@@ -338,18 +432,329 @@ void turn_figure(figure_t *f, board_t *p_b, figure_shape_name_t ns) {
       break;
     case F_STATUS_POSITION_OK:
       turn_ok = true;
-      copy_figure(symulate_figure, f);      
+      copy_figure(f, &symulate_figure, &symulate_figure.p0);
       break;
     case F_STATUS_POSITION_LEFT_B:      
-      symulate_figure->p0.x++;
+      symulate_figure.p0.x++;
       break;
     case F_STATUS_POSITION_RIGHT_B:      
-      symulate_figure->p0.x--;
+      symulate_figure.p0.x--;
       break;
     }
   } while(! (turn_ok || turn_not_possible));
+  print_figure(&p_b->w, f);
 }
 
+
+
+/**
+ * @brief move figure right
+ * 
+ * @param p_b 
+ * @param f 
+ */
+void move_right(board_t *p_b, figure_t *f){ 
+  unprint_figure(&p_b->w, f);
+  int i = 0;  
+  print_info(5,1, "%s", "moving RIGHT");
+  if( f->xr < (p_b->right_x)){// - 1) ){      
+    for(i = 0; i < 4; i++){
+      /*
+      TODO:
+      case :
+                 **  ***
+                 *** *  <- place where it shoud be possible move left
+                 *****
+      it demand storing not only ground line but 
+      whole shape of ground (x and y)
+      */
+      /* 
+      y is near bottom when is greater 
+      xr+1 is not > board.right_x, because check in if^^^
+      */
+      if(board.b[f->box[i].c.y][f->box[i].c.x].p != ref_board_empty_field.p) {
+        return;
+      }
+    }  
+    for(i = 0; i < 4; i++){    
+      f->box[i].c.x++;
+    }
+    f->p0.x++;    
+    f->xr++;
+    f->xl++;
+  }
+  print_figure(&p_b->w, f);
+}
+
+
+
+/**
+ * @brief move figure left
+ * 
+ * @param p_b 
+ * @param f 
+ */
+void move_left(board_t *p_b, figure_t *f){ 
+  unprint_figure(&p_b->w, f);
+  int i = 0;  
+  print_info(5,1, "%s", "moving LEFT");
+  if(f->xl > (p_b->left_x)){// + 1)) {
+    for(i = 0; i < 4; i++){
+      /* 
+      y is near bottom when is greater 
+      xr-1 is not < board.left_x, because check in if^^^
+      */
+      if(board.b[f->box[i].c.y][f->box[i].c.x].p != ref_board_empty_field.p) {
+        return;
+      }
+    }      
+    for(i = 0; i < 4; i++){    
+      f->box[i].c.x--;
+    }
+    f->p0.x--;
+    f->xr--;
+    f->xl--;
+  }
+  print_figure(&p_b->w, f);
+}
+
+
+
+/**
+ * @brief create initial state of curren and next figures
+ * 
+ * @param f 
+ * @param p_b 
+ */
+void prepare_1figure_to_start(figure_t *f, board_t *p_b){     
+    unprint_figure(&p_b->w, f);
+    unprint_figure(&win_next.w, &next_figure);    
+
+    generate_next_figure(&next_figure, &p1);   
+    copy_figure(&current_figure, &next_figure, &p1);
+
+    generate_next_figure(&next_figure, &p2);   
+    print_figure(&win_next.w, &next_figure);
+    mvwprintw(win_next.w.w,1,1,"%s", "next figure:1");
+    wrefresh(win_next.w.w);
+
+    print_figure(&board.w, f);
+}
+
+
+
+/**
+ * @brief make one step down of figure's position
+ * This is controled by time passing.
+ * @param f 
+ * @param p_b 
+ */
+void step_down(figure_t *f, board_t *p_b){
+  unprint_figure(&p_b->w, f);
+  /* make one step down */  
+  int i = 0;
+  f->p0.y++;
+  for(i = 0; i < 4; i++) {
+    f->box[i].c.y++;
+  }
+  /* DEBUG */
+  if(f->p0.y >= BORAD_HIGHT - 2) {
+    mvwprintw(p_b->w.w, BORAD_HIGHT, 1, "bottom reached");
+    wrefresh(p_b->w.w);
+  }
+  assert(f->p0.y < (BORAD_HIGHT) );
+
+  /* check if now is bottom contact with ground 
+     (remnant of one of previous figure, or border of board) */
+  if(is_bottom_contact(f, p_b)){
+
+    diassemble_figure(f, p_b);   
+    /* f still exist, copy figure will destroy it soon */
+    unprint_figure(&win_next.w, &next_figure);
+    copy_figure(f, &next_figure, &p1);
+    generate_next_figure(&next_figure, &p2);       
+    print_figure(&win_next.w, &next_figure);    
+    mvwprintw(win_next.w.w,1,1,"%s", "next figure:1");
+    wrefresh(win_next.w.w);
+    
+    print_board();              
+  } 
+  else {
+    print_figure(&p_b->w, f);
+  }
+}
+
+
+
+/**
+ * @brief moving figure to the ground
+ * After pressing 'send figure do the ground' key.
+ * @param f 
+ * @param p_b 
+ */
+extern void move_down(figure_t *f, board_t *p_b){
+  /*
+  for(i = 0; i < 4; i++){
+    p_b->ground_level[f->box[i].c.x]
+    f->box[i].c.y = ...
+  }
+
+  //TODO
+  */
+  print_board();
+}
+
+
+
+/**
+ * @brief Create a window frame object
+ * 
+ * @param p_gm 
+ * @param h 
+ * @param w 
+ * @param ty 
+ * @param lx 
+ */
+void create_window_frame(gm_window_t *p_gm, unsigned h, unsigned w, unsigned ty, unsigned lx){
+  p_gm->left_x = lx;
+  p_gm->top_y = ty;
+  p_gm->height = h;
+  p_gm->width = w;
+  p_gm->w = newwin(p_gm->height, p_gm->width, p_gm->top_y, p_gm->left_x);
+  wborder(p_gm->w, '|','|','-','-','+','+','+','+');
+  //box(board.w, 0, 0);
+  wrefresh(p_gm->w);
+}
+
+
+
+/**
+ * @brief restoring beginning content of board's fileds.
+ * 
+ */
+void board_reset(){
+  int i = 0;
+  int j = 0;  
+  for(i = 1; i < BORAD_HIGHT - 1; i++){
+    for(j = 1; j < BOARD_WIDTH - 1; j++){
+      board.b[i][j].p = ref_board_empty_field.p;
+      board.b[i][j].c = ref_board_empty_field.c;
+    }  
+    /* contact with board boarder is detected in 
+    is_bottom_contact function by checking coordinates
+    instead of checking filds content 
+    */    
+  }
+}
+
+
+
+int main(int argc, char **argv){
+
+  /* init tools */
+  setlocale(LC_ALL, ""); //for unicode
+  initscr();
+
+  #ifdef CONTROL_LOOP
+  timeout(0); //0 - noblokgin -1 - blocking; >0 waith ms and err
+  //nodelay(stdscr, TRUE);
+  #endif //CONTROL_LOOP
+  #ifdef CONTROL_THREAD
+  timeout(1); //0 - noblokgin -1 - blocking; >0 waith ms and err
+  #endif //CONTROL_THREAD
+  #ifdef CONTROL_SIGNAL
+  #endif //CONTROL_SIGNAL
+  
+
+  //raw();
+  cbreak();
+
+  keypad(stdscr, TRUE);
+  noecho();
+  curs_set(0);  //invisible cursor
+  refresh();   //must be before newwin() to order to drwain that newwindow
+  
+  srand(time(NULL));
+  
+  //test_print_figures();
+  
+
+
+
+  /************** inicjalize game components ********** */
+  game_state.intv_stepdown = 1;  // 1 sek;
+  //game_cfg. ...
+  
+  
+  /************ board initialization  **************/
+  create_window_frame(&board.w, BORAD_HIGHT, BOARD_WIDTH, 0, 0);
+  nodelay(board.w.w, TRUE);
+  board.left_x = board.w.left_x;
+  board.right_x = board.w.left_x + board.w.width - 2; //-1 -> cover right border       
+
+  board_reset();
+
+  //global:coord_t p1;  //point of createing new figure
+  p1.x = board.w.width / 2;
+  p1.y = board.w.top_y + 4;
+  p2.x = board.w.width / 2;
+  p2.y = 4;
+
+
+
+  /********  creating windows  **************/
+  /***** next   ******/
+  create_window_frame(&win_next.w, 
+    BORAD_HIGHT / 3, COLS - BOARD_WIDTH, 0 * (BORAD_HIGHT / 3), BOARD_WIDTH + 1);   
+
+  /***** score  ******/
+  create_window_frame(&win_score.w, 
+    BORAD_HIGHT / 3, COLS - BOARD_WIDTH, 1 * (BORAD_HIGHT / 3), BOARD_WIDTH + 1);
+  
+  wnd_info = win_score.w.w;
+
+  /***** hint   ******/  
+  create_window_frame(&win_hint.w, 
+    BORAD_HIGHT / 3, COLS - BOARD_WIDTH, 2 * (BORAD_HIGHT / 3), BOARD_WIDTH + 1);
+  
+  refresh();
+
+
+
+  /***********  main loop  ***************/
+  
+  #ifdef CONTROL_LOOP
+  user_control();
+  time_control();
+  #endif //CONTROL_LOOP
+
+  #ifdef CONTROL_THREAD
+  pthread_t th_user_control;
+  create_thread(&th_user_control, NULL, user_control, NULL);
+  pthread_t th_time_control;
+  create_thread(&th_time_control, NULL, time_control, NULL);
+
+  pthread_join(th_user_control, NULL);
+  pthread_join(th_time_control, NULL);
+  #endif // CONTROL_THREAD
+
+  #ifdef CONTROL_SIGNAL
+  #endif //CONTROL_SIGNAL
+
+  delwin(board.w.w);
+  endwin();
+
+  return 0;
+}
+/* =================================================================== */
+
+
+/**
+ * @brief turn figure left
+ * 
+ * @param f 
+ * @param p_b 
+ */
 extern void turn_left(figure_t* f, board_t *p_b){
   figure_shape_name_t  ns = FS_DEBUG;
   switch(f->fs){   
@@ -426,6 +831,12 @@ extern void turn_left(figure_t* f, board_t *p_b){
 
 
 
+/**
+ * @brief turn figure right
+ * 
+ * @param f 
+ * @param p_b 
+ */
 extern void turn_right(figure_t* f, board_t *p_b){
   figure_shape_name_t  ns = FS_DEBUG;
  switch(f->fs){   
@@ -497,455 +908,6 @@ extern void turn_right(figure_t* f, board_t *p_b){
     ns = FS_H1_HAT;
     break;   //H4  
   
-  }
-  turn_figure(f, p_b, ns);  
-}
-
-
-extern void move_right(board_t *p_b, figure_t *f){ /*REFACTOR*/
-  int i = 0;  
-  print_info(5,1, "%s", "moving RIGHT");
-  if( f->xr < (p_b->right_x)){// - 1) ){      
-    for(i = 0; i < 4; i++){
-      /*
-      TODO:
-      case :
-                 **  ***
-                 *** *  <- place where it shoud be possible move left
-                 *****
-      it demand storing not only ground line but 
-      whole shape of ground (x and y)
-      */
-      /* 
-      y is near bottom when is greater 
-      xr+1 is not > board.right_x, because check in if^^^
-      */
-      if(ptr_board->ground_level[f->xr + 1] <= f->box[i]->c.y){
-        return;
-      }
-    }  
-    for(i = 0; i < 4; i++){    
-      f->box[i]->c.x++;
-    }
-    f->p0.x++;    
-    f->xr++;
-    f->xl++;
-  }
-}
-
-extern void move_left(board_t *p_b, figure_t *f){ /*REFACTOR*/
-  int i = 0;  
-  print_info(5,1, "%s", "moving LEFT");
-  if(f->xl > (p_b->left_x)){// + 1)) {
-    for(i = 0; i < 4; i++){
-      /* 
-      y is near bottom when is greater 
-      xr-1 is not < board.left_x, because check in if^^^
-      */
-      if(ptr_board->ground_level[f->xl - 1] <= f->box[i]->c.y){
-        return;
-      }
-    }      
-    for(i = 0; i < 4; i++){    
-      f->box[i]->c.x--;
-    }
-    f->p0.x--;
-    f->xr--;
-    f->xl--;
-  }
-}
-
-extern void step_down(figure_t *f, board_t *p_b){
-  int i = 0;
-  f->p0.y++;
-  for(i = 0; i < 4; i++) {
-    f->box[i]->c.y++;
-  }
-  if(f->p0.y > BORAD_HIGHT - 1) {
-    mvwprintw(p_b->w.w, BORAD_HIGHT, 1, "the bottom has been reached");
-    wrefresh(p_b->w.w);
-  }
-  
-  if(is_bottom_contact(f,p_b)){
-    diassemble_figure(f, p_b);
-    print_ground(p_b);
-    //f = NULL;  //in diasseble, and local varialble
-    unprint_figure(&win_next.w, next_figure);
-    current_figure = next_figure;  
-    //f = current_figure;  //local variable
-    
-    next_figure = NULL;
-    if(! (next_figure = create_figure(rand()%19 + 1, rand()%REF_BOX_V_MAX, &p1))) exit(-1);
-    print_figure(&win_next.w, next_figure);
-    mvwprintw(win_next.w.w,1,1,"%s", "next figure:3");
-    wrefresh(win_next.w.w);
   }  
+  turn_figure(f, p_b, ns);    
 }
-
-extern void move_down(figure_t *f, board_t *p_b){
-  int i = 0;
-  /*
-  for(i = 0; i < 4; i++){
-    p_b->ground_level[f->box[i]->c.x]
-    f->box[i]->c.y = ...
-  }
-  */
-  print_ground(p_b);
-}
-
-
-void test_shape_definition(){
-  for(int i = 0; i < FIGURE_NUMBER; i++){
-    for(int j = 0; j < 4; j++){
-      printf("[%2d, %2d]", shape[i][j].x, shape[i][j].y);
-    }
-    printf("%s", "\n");
-  }
-}
-
-
-void test_print_figures(){
-  int shift_x = 2;
-  int shift_y = 10;
-  for(int i = 0; i < FIGURE_NUMBER; i++){
-    if(!(i % 4)) {
-      shift_y += 4;
-      shift_x = 2;
-    }
-    for(int j = 0; j < 4; j++){      
-      mvprintw(shift_y + shape[i][j].y, shift_x + shape[i][j].x, "%c", 'x'); //'\u2592'); //0x2588); // 219); // 178); //, "%d", i%10);      
-    }
-    shift_x += 6;
-    refresh();
-  }  
-}
-
-bool is_time_to_step(clock_t t1, unsigned intv){
-  mvwprintw(win_score.w.w,4,1,"%u  %u",t1, clock());
-  wrefresh(win_score.w.w);
-  if( (clock() - t1) > (CLOCKS_PER_SEC/1000) * intv ) {
-    mvwprintw(win_score.w.w,5,1,"%s","time past");
-    wrefresh(win_score.w.w);
-    return true;
-  }
-  return false;
-}
-
-void main_loop(board_t *p_board, coord_t *p_p1){
-
-  int16_t key;
-  //uint8_t keyH;
-  //uint8_t keyL;
-  char akey[4] = {0,0,0,0};
-  bool finishDrawinFigures = false;
-
-  clock_t time_start;
-  unsigned interval = 500; //ms
-
-  figure_t *f = NULL;  
-  figure_shape_name_t fs = 0;
-
-  fs = rand()%19 + 1;
-  current_figure = NULL;
-  if(! (current_figure = create_figure(fs, rand()%REF_BOX_V_MAX, p_p1))) exit(-1);
-  symulate_figure = NULL;
-  if(! (symulate_figure = create_figure(0, 0, p_p1))) exit(-1);
-
-  fs = rand()%19 + 1;
-  next_figure = NULL;
-  if(! (next_figure = create_figure(fs, rand()%REF_BOX_V_MAX, p_p1))) exit(-1);
-  mvwprintw(win_next.w.w,1,1,"%s", "next figure:1");
-  print_figure(&win_next.w, next_figure);
-  
-  f = current_figure;
-  print_figure(&p_board->w, f);
-  
-  mvwprintw(win_hint.w.w, 1, 1,"%s","[ESC] or [q] => exit,  [c] => clear");
-  mvwprintw(win_hint.w.w, 2, 1,"%s","[<-] move left,     [->] move right");
-  mvwprintw(win_hint.w.w, 3, 1,"%s","[space]  drop down,  [n] new figure");
-  wrefresh(win_hint.w.w);
-  time_start = clock();
-  while(!finishDrawinFigures){
-    
-    if(is_time_to_step(time_start, interval)){
-      unprint_figure(&p_board->w, f);
-      step_down(f,p_board);
-      f = current_figure; //potential NULL in step_down/dissablemble_figure
-      print_figure(&p_board->w, f);
-      wrefresh(p_board->w.w);
-      refresh();
-      time_start = clock();
-      /*
-      after step don't process key input
-      becasue 1 action at time
-      (step + move left/right may cause not detect contact with ground)
-      */
-      //continue;  
-    }
-    
-    //mvwprintw(win_hint.w.w, 4, 1,"%s","catching cursor here");
-    //wrefresh(win_hint.w.w);
-    curs_set(0);  //invisible cursor
-  
-    key = 0;
-    key = getch();
-    //keyH = key >> 8;
-    //keyL = (uint8_t) key;
-    akey[0] = key;
-    print_info(2,1,"%c", akey);
-    switch(key){
-      case 27: //ESC
-      case 'q':
-        finishDrawinFigures = true;
-        break;
-
-      case 'c':   /****   debug section *********/
-        
-        clear();   //clear border definition of windows
-        // wrefresh(p_board->w.w);  //not drawing window again
-        // wrefresh(win_next.w.w);  //there is necessity call wborder(...) again
-        // wrefresh(win_score.w.w);
-        // wrefresh(win_hint.w.w);
-        // refresh();
-        mvwprintw(win_hint.w.w, 1, 1,"%s","[ESC] or [q] => exit,  [c] => clear");
-        mvwprintw(win_hint.w.w, 2, 1,"%s","[<-] move left,     [->] move right");
-        mvwprintw(win_hint.w.w, 3, 1,"%s","[space]  drop down,  [n] new figure");
-        wrefresh(win_hint.w.w);
-        unprint_figure(&p_board->w, f);        
-        print_figure(&p_board->w, f);
-        break;
-
-      case 'n':  /******  debug section **********/
-        unprint_figure(&p_board->w, current_figure);        
-        unprint_figure(&win_next.w, next_figure);            
-
-        free(current_figure);                
-        current_figure = NULL;
-        current_figure = next_figure;
-        
-        next_figure = NULL;                
-        fs = rand()%19 + 1;
-        if(! (next_figure = create_figure(fs, rand()%REF_BOX_V_MAX, p_p1))) exit(-1);      
-        mvwprintw(win_next.w.w,1,1,"%s", "next figure:2");
-        print_figure(&win_next.w, next_figure);
-        
-        f = current_figure;                
-        print_figure(&p_board->w, f);
-
-        break;
-
-
-      case KEY_LEFT:
-      case 'l':        
-        unprint_figure(&p_board->w, f);
-        move_left(p_board, f);
-        print_figure(&p_board->w, f);
-        break;
-      case KEY_RIGHT:
-      case 'r':        
-        unprint_figure(&p_board->w, f);
-        move_right(p_board, f);
-        print_figure(&p_board->w, f);
-        break;
-      case KEY_UP:        
-        unprint_figure(&p_board->w, f);      
-        turn_left(f, p_board);
-        print_figure(&p_board->w, f);
-        break;
-      case KEY_DOWN:        
-        unprint_figure(&p_board->w, f);
-        turn_right(f, p_board);
-        print_figure(&p_board->w, f);
-        break; 
-      case ' ':
-        unprint_figure(&p_board->w, f);
-        move_down(f, p_board);
-        print_figure(&p_board->w, f);
-        break;
-      //default:         
-       // break;      
-    }//switch
-
-  }//while
-  
-  
-}//test_draw_shape()
-
-void create_window_frame(gm_window_t *p_gm, unsigned h, unsigned w, unsigned ty, unsigned lx){
-  p_gm->left_x = lx;
-  p_gm->top_y = ty;
-  p_gm->height = h;
-  p_gm->width = w;
-  p_gm->w = newwin(p_gm->height, p_gm->width, p_gm->top_y, p_gm->left_x);
-  wborder(p_gm->w, '|','|','-','-','+','+','+','+');
-  //box(board.w, 0, 0);
-  wrefresh(p_gm->w);
-}
-
-
-
-int main(int argc, char **argv){
-  int i = 0;
-  setlocale(LC_ALL, "");  
-  initscr();
-  timeout(0); //0 - noblokgin -1 - blocking; >0 waith ms and err
-  //nodelay(stdscr, TRUE);
-  
-  raw();
-  keypad(stdscr, TRUE);
-  noecho();
-  refresh();   //must be before newwin() to order to drwain that newwindow
-  srand(time(NULL));
-  
-  //test_print_figures();
-  
-  int odp_key = 0;
-  
-  /********  creating windows  **************/
-  board_t board;
-  ptr_board = &board;
-  create_window_frame(&board.w, BORAD_HIGHT, BOARD_WIDTH, 0, 0);
-  nodelay(board.w.w, TRUE);
-  board.left_x = board.w.left_x;
-  board.right_x = board.w.left_x + board.w.width - 2; //-1 -> cover right border       
-  for(i = 1; i < BOARD_WIDTH - 1; i++){
-    board.ground_level[i] = BORAD_HIGHT - 1; /* -0 belowe visible area */
-  }
-  int j = 0;
-  for(i = 1; i < BORAD_HIGHT - 1; i++)
-    for(j = 1; j < BOARD_WIDTH - 1; j++){
-      board.b[i][j].p = ' ';
-      board.b[i][j].c = 0;
-    }
-  
-  //global:coord_t p1;  //point of createing new figure
-  p1.x = board.w.width / 2;
-  p1.y = board.w.top_y + 5;
-
-  /***** next   ******/
-  create_window_frame(&win_next.w, 
-    BORAD_HIGHT / 3, COLS - BOARD_WIDTH, 0 * (BORAD_HIGHT / 3), BOARD_WIDTH + 1);   
-
-  /***** score  ******/
-  create_window_frame(&win_score.w, 
-    BORAD_HIGHT / 3, COLS - BOARD_WIDTH, 1 * (BORAD_HIGHT / 3), BOARD_WIDTH + 1);
-  
-  wnd_info = win_score.w.w;
-
-  /***** hint   ******/  
-  create_window_frame(&win_hint.w, 
-    BORAD_HIGHT / 3, COLS - BOARD_WIDTH, 2 * (BORAD_HIGHT / 3), BOARD_WIDTH + 1);
-  
-  refresh();
-
-  /***********  main loop  ***************/
-  //test_shape_definition();  
-  main_loop(&board, &p1);
-
-  delwin(board.w.w);
-  endwin();
-
-  return 0;
-}
-
-
-// /**
-//  * @brief 
-//  * 
-//  * @param f 
-//  */
-// extern void flip_horizontally(figure_t *f) {
-//   //TODO: wrong
-//   int i = 0;
-//   unsigned horiz_revrse_x[4];
-//   for(i = 0; i < 4; i++){
-//     mvprintw(6 + i, 2,"c.x[%d] c,y[%d]", f->box[i]->c.x, f->box[i]->c.y);        
-//     horiz_revrse_x[3 - i] = f->box[i]->c.x;
-//   }
-//   for(i = 0; i < 4; i++){
-//     f->box[i]->c.x = horiz_revrse_x[i];
-//     mvprintw(6 + i, 15,"c.x[%d] c,y[%d]", f->box[i]->c.x, f->box[i]->c.y);        
-//   }        
-//   determine_LR_edge(f);
-// }
-
-// extern void flip_vertically(figure_t *f){
-//   //TODO: wrong
-//   int i = 0;  
-//   unsigned vertical_revrse_y[4];
-//   for(i = 0; i < 4; i++){
-//     mvprintw(6 + i, 2,"c.x[%d] c,y[%d]", f->box[i]->c.x, f->box[i]->c.y);        
-//     vertical_revrse_y[3 - i] = f->box[i]->c.y;
-//   }
-//   for(i = 0; i < 4; i++){
-//     f->box[i]->c.y = vertical_revrse_y[i];
-//     mvprintw(6 + i, 15,"c.x[%d] c,y[%d]", f->box[i]->c.x, f->box[i]->c.y);        
-//   }        
-//   determine_LR_edge(f);
-// }
-
-// /* ____   //rotation acdording to right block
-//   {{0,0},{+1,0},{+2,0},{+2,-1}}, // ___I
-//   {{0,0},{+1,0},{0,-1},{0,-2}}, //   |_
-//   {{0,0},{0,-1},{+1,-1},{+2,-1}}, //  I---
-//   {{0,0},{0,-1},{0,-2},{-1,-2}}, //   -|  
-// */
-// typedef struct rotate_table_tt {
-//   size_t n;
-//   figure_shape_name_t *form;
-// } rotate_table_t;
-// /**
-//  * @brief Create and fills a rotate table object
-//  * which is used to figure out next form of figure during rotation
-//  * @param n 
-//  * @param ... 
-//  * @return rotate_table_t* 
-//  */
-// rotate_table_t *create_rotate_table(size_t n, ...){    
-//   rotate_table_t *rt = NULL;
-//   int i = 0;  
-//   va_list args;  
-//   va_start(args, n);
-
-//   rt = calloc(1, sizeof(rotate_table_t));  
-//   if(rt == NULL){
-//     perror("rotate_table_t, can't allocate memory");
-//     return NULL;
-//     //exit(-1);
-//   }      
-//   rt->form = calloc(n, sizeof(figure_shape_name_t));
-//   if(rt->form == NULL){
-//     perror("rotate_table_t->form, can't allocate memory");
-//     free(rt);
-//     return NULL;
-//     //exit(-1);    
-//   }
-//   rt->n = n;
-//   for(i = 0; i < n; i++){
-//     rt->form[i]  = va_arg(args, figure_shape_name_t);
-//   }
-//   va_end(args);
-//   return rt;
-// }
-
-
-
-// int craete_tables(){
-//   rotate_table_t *rt_box = create_rotate_table(1, FS_BOX);
-//   rotate_table_t *rt_line = create_rotate_table(2, FS_LINE_V, FS_LINE_H);
-//   rotate_table_t *rt_L = create_rotate_table(4, FS_L_, FS_L_LEFT, FS_L_BOTTOMUP, FS_L_RIGHT);
-//   rotate_table_t *rt_RL = create_rotate_table(4, FS_RL_, FS_RL_LEFT, FS_RL_BOTTOMUP, FS_RL_RIGHT);
-//   rotate_table_t *rt_Z = create_rotate_table(2, FS_Z_, FS_Z_LEFT);
-//   rotate_table_t *rt_RZ = create_rotate_table(2, FS_RZ_, FS_RZ_LEFT);
-//   if(
-//     rt_box == NULL || rt_line == NULL || rt_L == NULL || rt_RL == NULL ||
-//     rt_Z == NULL || rt_RZ == NULL) 
-//     return -1;
-//   printf("box: %d: %d\n", (int)rt_box->n, (int)rt_box->form[0]);
-//   printf("rt_L: %d: %d, %d, %d, %d\n", 
-//     (int)rt_L->n, 
-//     (int)rt_L->form[0], (int)rt_L->form[1], 
-//     (int)rt_L->form[2], (int)rt_L->form[3]);
-
-//   return 0;
-// }
