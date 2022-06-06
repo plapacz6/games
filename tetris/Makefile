@@ -1,4 +1,5 @@
 CC=gcc
+//FLAGS= -g -Wall -std=c99 -pthread -DDEBUG
 FLAGS= -g -Wall -std=c99 -pthread
 LINKER_FLAGS= -g -Wall 
 LIBS=  $(ncursesw5-config --cflags --libs) -lncurses 
@@ -6,7 +7,7 @@ LIBS=  $(ncursesw5-config --cflags --libs) -lncurses
 OBJECTS= tetris.o
 
 
-tetris: tetris.o control_loop.o
+tetris: tetris.o control_loop.o print_bin.o
 	$(CC) $(LINKER_FLAGS) $^  $(LIBS) -o $@
 
 tetris.o: tetris.c tetris.h control_version.h
@@ -30,6 +31,11 @@ control_thread.o: control_thread.c tetris.h control_version.h
 
 control_signal.o: control_signal.c tetris.h control_version.h
 	$(CC) $(FLAGS) -DCONTROL_SIGNAL control_signal.c -c
+
+
+print_bin.o: print_bin.h print_bin.c
+	$(CC) $(FLAGS) -DCONTROL_LOOP print_bin.c -c
+
 
 .PHONY: clean
 

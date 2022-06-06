@@ -25,6 +25,9 @@ figure_t symulate_figure;
 coord_t p1;  //point of creating new figure
 coord_t p2;  //point of creating next figure
 
+uint32_t color_attribute = 0;
+uint32_t color_bw = 0;
+
 char *error_msg = {
     "create figure: cant allocate memory for ...",    
 };
@@ -53,18 +56,28 @@ void print_info(unsigned y, unsigned x,char *fs, char *msg){
  */
 void print_figure(gm_window_t *p_w, figure_t *f){
   size_t i = 0;  
+  int color_nr = 1;
+  uint32_t color_attr = 1;
   for(i = 0; i < 4; i++){
     assert(f->box[i].bg_filled == false);
     print_info(3, 1, "%s", "print box_t"); /*DEBUG*/
     
     wmove(p_w->w, f->box[i].c.y, f->box[i].c.x);
     f->box[i].bg = inch();  //archiving background
+    //wattr_on(stdscr,((((chtype)((((f->box[i].v.c)))) << ((0) + 8)) & ((chtype)((((1UL) << 8) - 1UL)) << ((0) + 8)))),());
+    color_nr = (f->box[i].v.c);
+    (color_attr = color_bw ) || (color_attr = COLOR_PAIR( color_nr ) );
+    wattron(p_w->w, color_attr);
+    //mvwprintw(p_w->w, 5,1,"TEKST KONTROLNY: %10.x %s", color_attr, print_bin(color_attr));
+    
     mvwprintw(p_w->w, 
       f->box[i].c.y, 
       f->box[i].c.x, 
       "%c", f->box[i].v.p);    
+    wattroff(p_w->w, color_attr);      
     f->box[i].bg_filled = true;
-  }  
+  }    
+  
   wrefresh(p_w->w);
 }
 
@@ -103,12 +116,18 @@ void unprint_figure(gm_window_t *p_w, figure_t *f){
  * 
  * @param p_b 
  */
-void print_board(){
+void print_board(){  
+  int color_nr = 1;
+  uint32_t color_attr = 1;  
   int i = 0; 
   int j = 0;
   for(i = 1; i < BORAD_HIGHT - 1; i++)
     for(j = 1; j < BOARD_WIDTH -1; j++){
+      color_nr = board.b[i][j].c;
+      (color_attr = color_bw ) || (color_attr = COLOR_PAIR( color_nr ) );
+      wattron(board.w.w, color_attr);      
       mvwprintw(board.w.w, i, j, "%c", board.b[i][j].p);
+      wattroff(board.w.w, color_attr);      
     }
   wrefresh(board.w.w);
 }
@@ -155,9 +174,10 @@ coord_t shape[FIGURE_NUMBER][4] = {
 };
 
 box_appearc_t ref_box_v[REF_BOX_A_MAX] = {
-  {'X',1},{'x',1},{'*',1},{'o',1},{'#',1},
+  {'X',2},{'x',3},{'*',4},{'o',5},{'#',6},
   //{ACS_BLOCK,1},{ACS_BOARD,1},{ACS_BOARD,1}
 };
+
 box_appearc_t ref_board_empty_field = {
   ' ', 0
 };
@@ -654,6 +674,64 @@ int main(int argc, char **argv){
   /* init tools */
   setlocale(LC_ALL, ""); //for unicode
   initscr();
+  if(has_colors()){
+    mvprintw(&win_score.w, 1, 1, "terminal has colors");
+    start_color();
+    if(can_change_color()){
+      mvprintw(&win_score.w, 2, 1, "terminal can change colors");
+      init_color(COLOR_BLACK, 10,10,10);
+      init_color(COLOR_WHITE, 900,900,900);
+
+      init_color(COLOR_RED, 700,0,0);
+      init_color(COLOR_GREEN, 0,1000,400);     
+      init_color(COLOR_YELLOW, 500, 500, 0);
+
+      init_color(COLOR_BLUE, 0,0,1000);            
+      init_color(COLOR_CYAN, 50,0,1000);      
+      init_color(COLOR_MAGENTA, 500,500,1000);      
+    }
+    init_pair(1,COLOR_WHITE, COLOR_CYAN);
+    init_pair(2,COLOR_WHITE, COLOR_BLUE);
+    init_pair(3,COLOR_WHITE, COLOR_MAGENTA);
+    init_pair(4,COLOR_WHITE, COLOR_GREEN);
+    init_pair(5,COLOR_WHITE, COLOR_YELLOW);        
+    init_pair(6,COLOR_WHITE, COLOR_RED);    
+    init_pair(7,COLOR_WHITE, COLOR_BLACK);
+    
+    color_attribute = 
+      COLOR_PAIR(1) | COLOR_PAIR(2) | COLOR_PAIR(3) | 
+      COLOR_PAIR(4) | COLOR_PAIR(5) | COLOR_PAIR(6);    
+    color_bw = 0;
+  }
+  else {
+    color_attribute = A_REVERSE;
+    color_bw = A_REVERSE;    
+  }
+  wattrset(win_next.w.w, color_attribute);      
+  wattrset(board.w.w, color_attribute);    
+  //(NCURSES_OK_ADDR(board.w) ? ((board.w.w)->_attrs = NCURSES_CAST(attr_t, color_attribute), OK) : ERR);    
+  
+  #ifdef DEBUG
+  {    
+    int color_nr = 6;
+    uint32_t color_attr = 0;
+    (color_attr = color_bw ) || (color_attr = COLOR_PAIR( color_nr ) );
+    //attron(COLOR_PAIR(color_nr));
+    attron(color_attr);
+    mvprintw(1,1,"TEKST KONTROLNY: %10.x %s", A_REVERSE, print_bin(A_REVERSE));  
+    mvprintw(2,1,"TEKST KONTROLNY: %10.x %s", COLOR_PAIR(2), print_bin(COLOR_PAIR(2)));  
+    mvprintw(3,1,"TEKST KONTROLNY: %10.x %s", COLOR_PAIR(4), print_bin(COLOR_PAIR(4)));  
+    mvprintw(4,1,"TEKST KONTROLNY: %10.x %s", COLOR_PAIR(2) | A_REVERSE , print_bin(COLOR_PAIR(2) | A_REVERSE ));  
+    mvprintw(4,1,"TEKST KONTROLNY: %10.x %s", COLOR_PAIR(2) |COLOR_PAIR(4) | A_REVERSE , print_bin(COLOR_PAIR(2) |COLOR_PAIR(4) | A_REVERSE ));  
+    
+    mvprintw(5,1,"TEKST KONTROLNY: %10.x %s", color_attr, print_bin(color_attr));
+    //attroff(COLOR_PAIR(color_nr));
+    attron(color_attr);
+    //getch();  
+    //endwin();
+    //return 0;
+  }
+  #endif 
 
   #ifdef CONTROL_LOOP
   timeout(0); //0 - noblokgin -1 - blocking; >0 waith ms and err

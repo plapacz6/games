@@ -1,4 +1,4 @@
-/* author: plapacz6@gmail.com, date: 2022-02-24 */
+/* author: plapacz6@gmail.com, date: 2022-05-20 */
 #include <stdio.h>
 #include <ncurses.h>
 #include "tetris.h"

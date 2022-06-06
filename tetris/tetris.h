@@ -7,6 +7,9 @@
 #include <assert.h>
 //#include <stdarg.h>
 #include <ncurses.h>
+#ifdef DEBUG
+#include "print_bin.h"
+#endif //DEBUG
 
 typedef enum  {
   FS_DEBUG,
@@ -70,7 +73,7 @@ typedef struct box_tt {
 
   /** handle background remembering */
   bool bg_filled;
-  uint16_t bg;
+  uint32_t bg;
 } box_t;
 
 
