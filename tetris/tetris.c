@@ -751,13 +751,13 @@ int main(int argc, char **argv){
       init_color(COLOR_CYAN, 50,0,1000);      
       init_color(COLOR_MAGENTA, 500,500,1000);      
     }
-    init_pair(1,COLOR_WHITE, COLOR_CYAN);
-    init_pair(2,COLOR_WHITE, COLOR_BLUE);
-    init_pair(3,COLOR_WHITE, COLOR_MAGENTA);
-    init_pair(4,COLOR_WHITE, COLOR_GREEN);
-    init_pair(5,COLOR_WHITE, COLOR_RED);    
-    init_pair(6,COLOR_WHITE, COLOR_YELLOW);            
-    init_pair(7,COLOR_WHITE, COLOR_BLACK);
+    init_pair(1,COLOR_CYAN, COLOR_CYAN);
+    init_pair(2,COLOR_BLUE, COLOR_BLUE);
+    init_pair(3,COLOR_MAGENTA, COLOR_MAGENTA);
+    init_pair(4,COLOR_GREEN, COLOR_GREEN);
+    init_pair(5,COLOR_RED, COLOR_RED);    
+    init_pair(6,COLOR_YELLOW, COLOR_YELLOW);            
+    init_pair(7,COLOR_WHITE, COLOR_WHITE);
     
     color_attribute = 
       COLOR_PAIR(1) | COLOR_PAIR(2) | COLOR_PAIR(3) | 
@@ -765,6 +765,7 @@ int main(int argc, char **argv){
     color_bw = 0;
   }
   else {
+    /*TODO correct restoring background*/
     color_attribute = A_REVERSE;
     color_bw = A_REVERSE;    
   }
