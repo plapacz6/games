@@ -22,6 +22,7 @@ board_t board;
 figure_t current_figure;
 figure_t next_figure;
 figure_t symulate_figure;
+
 coord_t p1;  //point of creating new figure
 coord_t p2;  //point of creating next figure
 
@@ -44,6 +45,7 @@ void print_info(unsigned y, unsigned x,char *fs, char *msg){
 }
 
 
+
 /**
  * @brief printf figure at the board
  * Before printing make copy of background
@@ -57,15 +59,17 @@ void print_info(unsigned y, unsigned x,char *fs, char *msg){
 void print_figure(gm_window_t *p_w, figure_t *f){
   size_t i = 0;  
   int color_nr = 1;
-  uint32_t color_attr = 1;
+  chtype color_attr = 1;
   for(i = 0; i < 4; i++){
     assert(f->box[i].bg_filled == false);
-    print_info(3, 1, "%s", "print box_t"); /*DEBUG*/
+    //print_info(3, 1, "%s", "print box_t"); /*DEBUG*/
     
     wmove(p_w->w, f->box[i].c.y, f->box[i].c.x);
-    f->box[i].bg = inch();  //archiving background
+    f->box[i].bg = winch(p_w->w);  //archiving background
     //wattr_on(stdscr,((((chtype)((((f->box[i].v.c)))) << ((0) + 8)) & ((chtype)((((1UL) << 8) - 1UL)) << ((0) + 8)))),());
+
     color_nr = (f->box[i].v.c);
+    
     (color_attr = color_bw ) || (color_attr = COLOR_PAIR( color_nr ) );
     wattron(p_w->w, color_attr);
     //mvwprintw(p_w->w, 5,1,"TEKST KONTROLNY: %10.x %s", color_attr, print_bin(color_attr));
@@ -73,13 +77,17 @@ void print_figure(gm_window_t *p_w, figure_t *f){
     mvwprintw(p_w->w, 
       f->box[i].c.y, 
       f->box[i].c.x, 
+
       "%c", f->box[i].v.p);    
+      //123 "%c", f->box[i].v);    
+
     wattroff(p_w->w, color_attr);      
     f->box[i].bg_filled = true;
   }    
   
   wrefresh(p_w->w);
 }
+
 
 
 /**
@@ -93,7 +101,7 @@ void unprint_figure(gm_window_t *p_w, figure_t *f){
   size_t i = 0;
   for(i = 0; i < 4; i++){    
     if(f->box[i].bg_filled){
-      print_info(3, 1, "%s", "un_print box");
+      //print_info(3, 1, "%s", "un_print box");
     
       //restoring backgound
       mvwprintw(
@@ -107,6 +115,8 @@ void unprint_figure(gm_window_t *p_w, figure_t *f){
     wrefresh(p_w->w);
   }
 }
+
+
 
 /**
  * @brief redrawing entire boread (use only before first call print_figure
@@ -125,12 +135,16 @@ void print_board(){
     for(j = 1; j < BOARD_WIDTH -1; j++){
       color_nr = board.b[i][j].c;
       (color_attr = color_bw ) || (color_attr = COLOR_PAIR( color_nr ) );
-      wattron(board.w.w, color_attr);      
+      wattron(board.w.w, color_attr);    
+
       mvwprintw(board.w.w, i, j, "%c", board.b[i][j].p);
+      //123 mvwprintw(board.w.w, i, j, "%c", board.b[i][j]);
+      
       wattroff(board.w.w, color_attr);      
     }
   wrefresh(board.w.w);
 }
+
 
 
 /**
@@ -174,7 +188,7 @@ coord_t shape[FIGURE_NUMBER][4] = {
 };
 
 box_appearc_t ref_box_v[REF_BOX_A_MAX] = {
-  {'X',2},{'x',3},{'*',4},{'o',5},{'#',6},
+  {'X',1},{'x',2},{'*',3},{'o',4},{'#',5},
   //{ACS_BLOCK,1},{ACS_BOARD,1},{ACS_BOARD,1}
 };
 
@@ -189,36 +203,42 @@ bool is_board_field_empty(coord_t *p_c) {
   return false;
 }
 
-/**
- * @brief find coord's y-part  1 before current ground level
- * 
- * @param p_c 
- */
-unsigned find_ground_y_coord(coord_t *p_c){
-  int i = 0;
-  for(i = p_c->y; i < BORAD_HIGHT; i++){
-    if( board.b[i][p_c->x].p != ref_board_empty_field.p){
-      break;
-    }
-  }  
-  return i - 1;
-}
+
 
 /**
  * @brief find coords of figure that are higher (less y part) in all figure's box'es highst
  * for move_down()
- * @param p_f 
+ * @param f - pointer to figure
+ * @oarput_figure_on_groundam p_b - pointer to board
  */
-void find_ground_figure_coord(figure_t *p_f){
+void put_figure_on_ground(figure_t *f, board_t *p_b){
   int i = 0;
-  unsigned min_y = 0;
-  unsigned prev_min_y = 0;
-  for(i = 0; i < 4; i++){
-    min_y = find_ground_y_coord(& p_f->box[i].c);
-    if(min_y < prev_min_y)
-      prev_min_y = min_y;
-  }
-  /* TODO ..........................  */
+  bool ground_found = false;
+  copy_figure(&symulate_figure, f, &(f->p0));  
+  do {
+    for(i = 0; i < 4; i++){
+      if(p_b->b[symulate_figure.box[i].c.y + 1]
+               [symulate_figure.box[i].c.x]
+               .p 
+        != ref_board_empty_field.p
+      ){     
+        ground_found = true;
+        break;
+      }
+    }
+    if(!ground_found) {
+      for(i = 0; i < 4; i++){ 
+        // a separate loop is needed to keep the figures consistent      
+        symulate_figure.box[i].c.y++;        
+      }
+      symulate_figure.p0.y++;
+      symulate_figure.yl++;
+      symulate_figure.yr++;     
+    }
+  } while(!ground_found);
+  copy_figure(f, &symulate_figure, &symulate_figure.p0);
+  determine_LR_edge(f);  
+  what_when_bottom_contact(f, p_b);      
   return;
 }
 
@@ -233,8 +253,8 @@ void find_ground_figure_coord(figure_t *p_f){
  * @return false 
  */
 bool is_bottom_contact(figure_t *f, board_t *b){
-  mvwprintw(win_score.w.w, 6,1,"%s","is_bottom_contact");
-  wrefresh(win_score.w.w);
+  //mvwprintw(win_score.w.w, 6,1,"%s","is_bottom_contact");
+  //wrefresh(win_score.w.w);
   int i = 0;  
   for(i = 0; i < 4; ++i) {
     /* 
@@ -245,10 +265,9 @@ bool is_bottom_contact(figure_t *f, board_t *b){
     */   
     if( (b->b[f->box[i].c.y + 1][f->box[i].c.x]).p 
           != ref_board_empty_field.p 
+          //123
         ||
-          //f->box[i].c.y == (BORAD_HIGHT - 2)   //c.y == 0 -> y:1
-          /* DEBUG vvv */
-          f->box[i].c.y >= (BORAD_HIGHT - 2)
+          (f->box[i].c.y + 1) >= GROUND_0
         ){
       return true;
       /*
@@ -261,6 +280,7 @@ bool is_bottom_contact(figure_t *f, board_t *b){
 }
 
 
+
 /**
  * @brief figure out left and right edge of figure
  * helping function
@@ -271,11 +291,18 @@ int determine_LR_edge(figure_t *fg) {
     //figure out left and right edge of figure
   int i = 0;
   for(i = 0; i < 4; i++){
-    if(fg->xl > fg->box[i].c.x) fg->xl = fg->box[i].c.x;
-    if(fg->xr < fg->box[i].c.x) fg->xr = fg->box[i].c.x;    
+    if(fg->xl > fg->box[i].c.x) {
+      fg->xl = fg->box[i].c.x;
+      fg->yl = fg->box[i].c.y;
+    }
+    if(fg->xr < fg->box[i].c.x) {
+      fg->xr = fg->box[i].c.x;    
+      fg->yr = fg->box[i].c.y;
+    }    
   }
   return 1;
-} /***************  complete ********************/
+} 
+
 
 
 /**
@@ -300,7 +327,7 @@ int define_shape_figure(figure_t *fg, figure_shape_name_t fs, unsigned bx) {
   }
   determine_LR_edge(fg);
   return 1;    
-} /***************  complete ********************/
+} 
 
 
 
@@ -321,6 +348,8 @@ int create_figure(figure_t *fg, figure_shape_name_t fs, unsigned bx, coord_t *p_
   
   fg->xl = p_p1->x;
   fg->xr = p_p1->x;
+  fg->yl = p_p1->y;
+  fg->yr = p_p1->y;
   fg->bx = bx;
     
   define_shape_figure(fg, fs, bx);  
@@ -342,8 +371,8 @@ int create_figure(figure_t *fg, figure_shape_name_t fs, unsigned bx, coord_t *p_
 void diassemble_figure(figure_t *f, board_t *b){
   assert(f->box[0].bg_filled == false);
 
-  mvwprintw(win_score.w.w, 6,1,"%s","disassemble figure");
-  wrefresh(win_score.w.w);
+  //mvwprintw(win_score.w.w, 6,1,"%s","disassemble figure");
+  //wrefresh(win_score.w.w);
 
   int i = 0;  
   for(i = 0; i < 4; i++){
@@ -392,6 +421,8 @@ void copy_figure(figure_t *f2, figure_t *f1, coord_t *p_p1){
   f2->bx = f1->bx;
   f2->xl = f1->xl;
   f2->xr = f1->xr;
+  f2->yl = f1->yl;
+  f2->yr = f1->yr;
 }
 
 
@@ -409,16 +440,20 @@ figure_status_position_t is_cover_LR(figure_t *f){
   for(i = 0; i < 4; i++){
     /* cover border of board */
     if(f->box[i].c.x == board.left_x) 
-      status += F_STATUS_POSITION_LEFT_B;
+      status &= F_STATUS_POSITION_LEFT_B;
     if(f->box[i].c.x == board.right_x) 
-      status += F_STATUS_POSITION_RIGHT_B;
+      status &= F_STATUS_POSITION_RIGHT_B;
     /* cover ground element */
+    /* 
+      assuming that step_down will be executed 
+      in the next pass of the loop 
+    */
     if( board.b[f->box[i].c.y][f->box[i].c.x].p 
           != ref_board_empty_field.p 
         ||
-          f->box[i].c.y >= (BORAD_HIGHT - 1)
+          f->box[i].c.y >= GROUND_0
         ){
-      status += F_STATUS_POSITION_G;
+      status &= F_STATUS_POSITION_G;
     }
   }  
   return status;  
@@ -437,12 +472,11 @@ void turn_figure(figure_t *f, board_t *p_b, figure_shape_name_t ns) {
   unprint_figure(&p_b->w, f);
   bool turn_ok = false;
   bool turn_not_possible = false;
-  figure_status_position_t curr_status = F_STATUS_POSITION_OK;
+  figure_status_position_t curr_status = F_STATUS_POSITION_OK;    
 
   copy_figure(&symulate_figure, f, &(f->p0));
-  do{    
-    define_shape_figure(&symulate_figure, ns, symulate_figure.bx);
-    
+  define_shape_figure(&symulate_figure, ns, symulate_figure.bx);  
+  do{      
     curr_status = is_cover_LR(&symulate_figure);
     switch (curr_status) {      
     case F_STATUS_POSITION_G:
@@ -453,6 +487,7 @@ void turn_figure(figure_t *f, board_t *p_b, figure_shape_name_t ns) {
     case F_STATUS_POSITION_OK:
       turn_ok = true;
       copy_figure(f, &symulate_figure, &symulate_figure.p0);
+      determine_LR_edge(f);
       break;
     case F_STATUS_POSITION_LEFT_B:      
       symulate_figure.p0.x++;
@@ -474,28 +509,22 @@ void turn_figure(figure_t *f, board_t *p_b, figure_shape_name_t ns) {
  * @param f 
  */
 void move_right(board_t *p_b, figure_t *f){ 
+  /* TODO - sometimes figures overlap */
   unprint_figure(&p_b->w, f);
   int i = 0;  
-  print_info(5,1, "%s", "moving RIGHT");
-  if( f->xr < (p_b->right_x)){// - 1) ){      
-    for(i = 0; i < 4; i++){
-      /*
-      TODO:
-      case :
-                 **  ***
-                 *** *  <- place where it shoud be possible move left
-                 *****
-      it demand storing not only ground line but 
-      whole shape of ground (x and y)
-      */
-      /* 
-      y is near bottom when is greater 
-      xr+1 is not > board.right_x, because check in if^^^
-      */
-      if(board.b[f->box[i].c.y][f->box[i].c.x].p != ref_board_empty_field.p) {
+  //print_info(5,1, "%s", "moving RIGHT");
+  if( f->xr < (p_b->right_x)
+      // &&      
+
+      // ((p_b->b[f->yr][f->xr + 1].p)== ref_board_empty_field.p)
+      //  //123 BOX_APPEARC_A(p_b->b[f->yr][f->xr + 1]) == BOX_APPEARC_A(ref_board_empty_field)
+
+    ){
+    for(i = 0; i < 4; i++){    
+      if ((p_b->b[f->box[i].c.y][f->box[i].c.x + 1].p) != ref_board_empty_field.p) {
         return;
       }
-    }  
+    }
     for(i = 0; i < 4; i++){    
       f->box[i].c.x++;
     }
@@ -515,16 +544,19 @@ void move_right(board_t *p_b, figure_t *f){
  * @param f 
  */
 void move_left(board_t *p_b, figure_t *f){ 
+/* TODO - sometimes figures overlap */  
   unprint_figure(&p_b->w, f);
   int i = 0;  
-  print_info(5,1, "%s", "moving LEFT");
-  if(f->xl > (p_b->left_x)){// + 1)) {
-    for(i = 0; i < 4; i++){
-      /* 
-      y is near bottom when is greater 
-      xr-1 is not < board.left_x, because check in if^^^
-      */
-      if(board.b[f->box[i].c.y][f->box[i].c.x].p != ref_board_empty_field.p) {
+  //print_info(5,1, "%s", "moving LEFT");
+  if(f->xl > (p_b->left_x)
+      // &&
+
+      // ((p_b->b[f->yl][f->xl - 1].p  & A_CHARTEXT) == ref_board_empty_field.p)
+      // //123 BOX_APPEARC_A(p_b->b[f->yr][f->xr - 1]) == BOX_APPEARC_A(ref_board_empty_field)      
+
+    ){
+    for(i = 0; i < 4; i++){    
+      if ((p_b->b[f->box[i].c.y][f->box[i].c.x - 1].p) != ref_board_empty_field.p) {
         return;
       }
     }      
@@ -577,6 +609,8 @@ void step_down(figure_t *f, board_t *p_b){
   for(i = 0; i < 4; i++) {
     f->box[i].c.y++;
   }
+  f->yl++;
+  f->yr++;
   /* DEBUG */
   if(f->p0.y >= BORAD_HIGHT - 2) {
     mvwprintw(p_b->w.w, BORAD_HIGHT, 1, "bottom reached");
@@ -587,7 +621,21 @@ void step_down(figure_t *f, board_t *p_b){
   /* check if now is bottom contact with ground 
      (remnant of one of previous figure, or border of board) */
   if(is_bottom_contact(f, p_b)){
+    what_when_bottom_contact(f, p_b);
+  } 
+  else {
+    print_figure(&p_b->w, f);
+  }
+}
 
+
+/**
+ * @brief fixing figure on the ground and preparing new figure
+ * 
+ * @param f - pointer to figure
+ * @param p_b - pointer to board
+ */
+void what_when_bottom_contact(figure_t *f, board_t *p_b){
     diassemble_figure(f, p_b);   
     /* f still exist, copy figure will destroy it soon */
     unprint_figure(&win_next.w, &next_figure);
@@ -597,13 +645,35 @@ void step_down(figure_t *f, board_t *p_b){
     mvwprintw(win_next.w.w,1,1,"%s", "next figure:1");
     wrefresh(win_next.w.w);
     
-    print_board();              
-  } 
-  else {
-    print_figure(&p_b->w, f);
-  }
+
+    print_board();      
+    game_state.counter_figures++;
+    print_scores();
+    collapse_ground(p_b);
+    print_board(); 
+    print_scores();     
 }
 
+
+void print_scores(void){
+    mvwprintw(win_score.w.w, 1, 1,"%s","number of");
+    mvwprintw(win_score.w.w, 2, 1,"    %s","grounded figures:");
+    mvwprintw(win_score.w.w, 3, 1,"      %u",game_state.counter_figures);
+    mvwprintw(win_score.w.w, 5, 1,"    %s","collapses:");
+    mvwprintw(win_score.w.w, 6, 1,"      %u",game_state.counter_collapses);
+    wrefresh(win_score.w.w);
+}
+
+
+/**
+ * @brief make full ground line collapse
+ * 
+ * @param p_b - pointer to board
+ */
+void collapse_ground(board_t *p_b){
+  //TODO - check that any ground line should not collapse
+  //game_state.counter_collapses++;
+}
 
 
 /**
@@ -612,18 +682,11 @@ void step_down(figure_t *f, board_t *p_b){
  * @param f 
  * @param p_b 
  */
-extern void move_down(figure_t *f, board_t *p_b){
-  /*
-  for(i = 0; i < 4; i++){
-    p_b->ground_level[f->box[i].c.x]
-    f->box[i].c.y = ...
-  }
+extern void move_down(figure_t *f, board_t *p_b){  
+  
+  put_figure_on_ground(f, p_b);
 
-  //TODO
-  */
-  print_board();
 }
-
 
 
 /**
@@ -647,7 +710,6 @@ void create_window_frame(gm_window_t *p_gm, unsigned h, unsigned w, unsigned ty,
 }
 
 
-
 /**
  * @brief restoring beginning content of board's fileds.
  * 
@@ -668,17 +730,16 @@ void board_reset(){
 }
 
 
-
 int main(int argc, char **argv){
 
   /* init tools */
   setlocale(LC_ALL, ""); //for unicode
   initscr();
   if(has_colors()){
-    mvprintw(&win_score.w, 1, 1, "terminal has colors");
+    //mvprintw(&win_score.w, 1, 1, "terminal has colors");
     start_color();
-    if(can_change_color()){
-      mvprintw(&win_score.w, 2, 1, "terminal can change colors");
+    if(0) { //can_change_color()){
+      //mvprintw(&win_score.w, 2, 1, "terminal can change colors");
       init_color(COLOR_BLACK, 10,10,10);
       init_color(COLOR_WHITE, 900,900,900);
 
@@ -694,8 +755,8 @@ int main(int argc, char **argv){
     init_pair(2,COLOR_WHITE, COLOR_BLUE);
     init_pair(3,COLOR_WHITE, COLOR_MAGENTA);
     init_pair(4,COLOR_WHITE, COLOR_GREEN);
-    init_pair(5,COLOR_WHITE, COLOR_YELLOW);        
-    init_pair(6,COLOR_WHITE, COLOR_RED);    
+    init_pair(5,COLOR_WHITE, COLOR_RED);    
+    init_pair(6,COLOR_WHITE, COLOR_YELLOW);            
     init_pair(7,COLOR_WHITE, COLOR_BLACK);
     
     color_attribute = 
@@ -797,7 +858,15 @@ int main(int argc, char **argv){
   
   refresh();
 
-
+  mvwprintw(win_hint.w.w, 1, 1,"%s","[ESC] or [q] => exit              ");
+  mvwprintw(win_hint.w.w, 3, 1,"%s","  [<-] move left,   [->]  move right");
+  mvwprintw(win_hint.w.w, 4, 1,"%s","  [up] turn left,   [down] turn right");
+  mvwprintw(win_hint.w.w, 5, 1,"%s","       [space]  drop down          ");
+  wrefresh(win_hint.w.w);     
+  
+  game_state.counter_figures = 0;
+  game_state.counter_collapses = 0;
+  print_scores();
 
   /***********  main loop  ***************/
   

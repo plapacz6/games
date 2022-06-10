@@ -5,11 +5,11 @@
 
 
 bool is_time_to_step(clock_t t1, unsigned intv){
-  mvwprintw(win_score.w.w,4,1,"%u  %u",t1, clock());
-  wrefresh(win_score.w.w);
+  //mvwprintw(win_score.w.w,4,1,"%u  %u",t1, clock());
+  //wrefresh(win_score.w.w);
   if( (clock() - t1) > (CLOCKS_PER_SEC/1000) * intv ) {
-    mvwprintw(win_score.w.w,5,1,"%s","time past");
-    wrefresh(win_score.w.w);
+    //mvwprintw(win_score.w.w,5,1,"%s","time past");
+    //wrefresh(win_score.w.w);
     return true;
   }
   return false;
@@ -30,12 +30,7 @@ void user_control(){
   unsigned interval = 500; //ms
 
   figure_t *f = &current_figure;
-  
-  mvwprintw(win_hint.w.w, 1, 1,"%s","[ESC] or [q] => exit,  [c] => clear");
-  mvwprintw(win_hint.w.w, 2, 1,"%s","[<-] move left,     [->] move right");
-  mvwprintw(win_hint.w.w, 3, 1,"%s","[space]  drop down,  [n] new figure");
-  wrefresh(win_hint.w.w);     
-  
+    
   time_start = clock();
 
   prepare_1figure_to_start(f, &board);
@@ -60,7 +55,7 @@ void user_control(){
     //keyH = key >> 8;
     //keyL = (uint8_t) key;
     akey[0] = key;
-    print_info(2,1,"%c", akey);  /*DEBUG*/
+    ////print_info(2,1,"%c", akey);  /*DEBUG*/
     
     switch(key){
       case 27: //ESC

@@ -61,7 +61,10 @@ typedef struct box_appearc_tt {
   box_pattern_t p;
   box_color_t c;
 } box_appearc_t;
-
+//123 typedef chtype box_appearc_t;
+ #define BOX_APPEARC_P(p) (p & A_CHARTEXT)
+ #define BOX_APPEARC_A(p) (p & A_ATTRIBUTES)
+ #define BOX_APPEARC_C(p) (p & A_COLOR)
 
 /**
  * @brief elemenent of figure
@@ -73,7 +76,7 @@ typedef struct box_tt {
 
   /** handle background remembering */
   bool bg_filled;
-  uint32_t bg;
+  chtype bg;
 } box_t;
 
 
@@ -86,6 +89,8 @@ typedef struct figure_tt {
   box_t box[4];   /**< coodrynates of each block of element( of fugure) */                       
   unsigned xl;    /**< x of left edge of figure */
   unsigned xr;    /**<  x of right edge */    
+  unsigned yl;    /**< y of left edge of figure */
+  unsigned yr;    /**< y of right edge of figure */
 } figure_t;
 
 typedef struct gm_window_tt{  
@@ -99,6 +104,7 @@ typedef struct gm_window_tt{
 /**************  board  ************************/
 #define BORAD_HIGHT (24)
 #define BOARD_WIDTH (40)
+#define GROUND_0 (BOARD_WIDTH - 1)
 typedef struct board_tt {  
   gm_window_t w;
   unsigned left_x;
@@ -128,6 +134,8 @@ typedef struct main_window_tt {
 /***************** game *************************/
 typedef struct game_state_tt {
   unsigned intv_stepdown; //interval of step down
+  unsigned counter_figures;
+  unsigned counter_collapses;
 } game_state_t;
 
 typedef struct game_cfg_tt {
@@ -164,9 +172,8 @@ void print_board();
 
 //bool is_board_field_empty(coord_t *p_c) ;
 
-//unsigned find_ground_y_coord(coord_t *p_c);
-//void find_ground_figure_coord(figure_t *p_f);
 
+void put_figure_on_ground(figure_t *f, board_t *p_b);
 bool is_bottom_contact(figure_t *f, board_t *b);
 
 int determine_LR_edge(figure_t *fg);
@@ -174,6 +181,9 @@ int define_shape_figure(figure_t *fg, figure_shape_name_t fs, unsigned bx);
 
 int create_figure(figure_t *fg, figure_shape_name_t fs, unsigned bx, coord_t *p_p1);
 void diassemble_figure(figure_t *f, board_t *b);
+void what_when_bottom_contact(figure_t *f, board_t *p_b);
+void print_scores(void);
+void collapse_ground(board_t *p_b);
 void generate_next_figure(figure_t *f, coord_t *p_p1);
 void copy_figure(figure_t *f2, figure_t *f1, coord_t *p_p1);
 
